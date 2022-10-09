@@ -4,9 +4,9 @@
 
 Occasionally you may see code that uses the ordinal method (Item 35) to index into an array or list. For example, consider this simplistic class meant to represent a plant:
 
-偶尔你可能会看到使用 `ordinal()` 的返回值（[Item-35](/Chapter-6/Chapter-6-Item-35-Use-instance-fields-instead-of-ordinals.md)）作为数组或 list 索引的代码。例如，考虑这个简单的类，它表示一种植物：
+你可能偶尔会看到使用 `ordinal()` 的返回值（[Item-35](/Chapter-6/Chapter-6-Item-35-Use-instance-fields-instead-of-ordinals.md)）作为数组或 list 索引的代码。例如，考虑这个简单的类，它表示一种植物：
 
-```
+```java
 class Plant {
     enum LifeCycle { ANNUAL, PERENNIAL, BIENNIAL }
     final String name;
@@ -27,7 +27,7 @@ Now suppose you have an array of plants representing a garden, and you want to l
 
 现在假设你有一个代表花园全部植物的 Plant 数组，你想要列出按生命周期（一年生、多年生或两年生）排列的植物。要做到这一点，你需要构造三个集合，每个生命周期一个，然后遍历整个数组，将每个植物放入适当的集合中：
 
-```
+```java
 // Using ordinal() to index into an array - DON'T DO THIS!
 Set<Plant>[] plantsByLifeCycle =(Set<Plant>[]) new Set[Plant.LifeCycle.values().length];
 
@@ -45,7 +45,8 @@ for (int i = 0; i < plantsByLifeCycle.length; i++) {
 ```
 
 **译注：假设 Plant 数组如下：**
-```
+
+```java
 Plant[] garden = new Plant[]{
         new Plant("A", LifeCycle.ANNUAL),
         new Plant("B", LifeCycle.BIENNIAL),
@@ -64,7 +65,7 @@ BIENNIAL: [B, D]
 
 This technique works, but it is fraught with problems. Because arrays are not compatible with generics (Item 28), the program requires an unchecked cast and will not compile cleanly. Because the array does not know what its index represents, you have to label the output manually. But the most serious problem with this technique is that when you access an array that is indexed by an enum’s ordinal, it is your responsibility to use the correct int value; ints do not provide the type safety of enums. If you use the wrong value, the program will silently do the wrong thing or—if you’re lucky—throw an ArrayIndexOutOfBoundsException.
 
-这种技术是有效的，但它充满了问题。因为数组与泛型不兼容（[Item-28](/Chapter-5/Chapter-5-Item-28-Prefer-lists-to-arrays.md)），所以该程序需要 unchecked 的转换，否则不能顺利地编译。因为数组不知道它的索引表示什么，所以必须手动标记输出。但是这种技术最严重的问题是，当你访问一个由枚举序数索引的数组时，你有责任使用正确的 int 值；int 不提供枚举的类型安全性。如果你使用了错误的值，程序将静默执行错误的操作，如果幸运的话，才会抛出 ArrayIndexOutOfBoundsException。
+这种技术是有效的，但它充满了问题。因为数组与泛型不兼容（[Item-28](/Chapter-5/Chapter-5-Item-28-Prefer-lists-to-arrays.md)），所以该程序需要 unchecked 的转换，否则不能顺利地编译。因为数组不知道它的索引表示什么，所以必须手动标记输出。但是这种技术最严重的问题是，当你访问一个由枚举序号索引的数组时，你有责任使用正确的 int 值；int 不提供枚举的类型安全性。如果你使用了错误的值，程序将静默执行错误的操作，如果幸运的话，才会抛出 ArrayIndexOutOfBoundsException。
 
 There is a much better way to achieve the same effect. The array is effectively serving as a map from the enum to a value, so you might as well use a Map. More specifically, there is a very fast Map implementation designed for use with enum keys, known as java.util.EnumMap. Here is how the program looks when it is rewritten to use EnumMap:
 
@@ -87,11 +88,13 @@ This program is shorter, clearer, safer, and comparable in speed to the original
 
 这个程序比原来的版本更短，更清晰，更安全，速度也差不多。没有不安全的转换；不需要手动标记输出，因为 Map 的键是能转换为可打印字符串的枚举；在计算数组索引时不可能出错。EnumMap 在速度上与有序索引数组相当的原因是，EnumMap 在内部使用这样的数组，但是它向程序员隐藏了实现细节，将 Map 的丰富的功能和类型安全性与数组的速度结合起来。注意，EnumMap 构造函数接受键类型的 Class 对象：这是一个有界类型标记，它提供运行时泛型类型信息（[Item-33](/Chapter-5/Chapter-5-Item-33-Consider-typesafe-heterogeneous-containers.md)）。
 
+**PP注**：前面文章里有种说法是泛型信息会在运行时被擦除，这里又说提供运行时泛型类型信息，是不是有冲突？查阅一些资料后，得出一个观点：局部变量的泛型信息运行时会被擦除，也就是说没有办法通过反射获取，成员变量的泛型，函数入参的泛型，继承泛型父类或实现泛型接口并指定了泛型都可以反射获取到泛型信息
+
 The previous program can be further shortened by using a stream (Item 45) to manage the map. Here is the simplest stream-based code that largely duplicates the behavior of the previous example:
 
 通过使用流（[Item-45](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md)）来管理映射，可以进一步缩短前面的程序。下面是基于流的最简单的代码，它在很大程度上复制了前一个示例的行为：
 
-```
+```java
 // Naive stream-based approach - unlikely to produce an EnumMap!
 System.out.println(Arrays.stream(garden).collect(groupingBy(p -> p.lifeCycle)));
 ```
@@ -103,9 +106,9 @@ System.out.println(Arrays.stream(garden).collect(groupingBy(p -> p.lifeCycle)));
 
 The problem with this code is that it chooses its own map implementation, and in practice it won’t be an EnumMap, so it won’t match the space and time performance of the version with the explicit EnumMap. To rectify this problem, use the three-parameter form of Collectors.groupingBy, which allows the caller to specify the map implementation using the mapFactory parameter:
 
-这段代码的问题在于它选择了自己的 Map 实现，而实际上它不是 EnumMap，所以它的空间和时间性能与显式 EnumMap 不匹配。要纠正这个问题，可以使用 `Collectors.groupingBy` 的三参数形式，它允许调用者使用 mapFactory 参数指定 Map 实现：
+这段代码的问题在于它选择了自己的 Map 实现类，而实际上它不是 EnumMap，所以它的空间和时间性能比不上使用 EnumMap。要纠正这个问题，可以使用 `Collectors.groupingBy` 的三参数形式，它允许调用者使用 mapFactory 参数指定 Map 实现类：
 
-```
+```java
 // Using a stream and an EnumMap to associate data with an enum
 System.out.println(
     Arrays.stream(garden).collect(groupingBy(p -> p.lifeCycle,() -> new EnumMap<>(LifeCycle.class), toSet()))
@@ -124,9 +127,9 @@ The behavior of the stream-based versions differs slightly from that of the Emum
 
 You may see an array of arrays indexed (twice!) by ordinals used to represent a mapping from two enum values. For example, this program uses such an array to map two phases to a phase transition (liquid to solid is freezing, liquid to gas is boiling, and so forth):
 
-你可能会看到被序数索引（两次！）的数组，序数用于表示两个枚举值的映射。例如，这个程序使用这样的一个数组来映射两个状态到一个状态的转换过程（液体到固体是冻结的，液体到气体是沸腾的，等等）：
+你可能会看到多维数组被序数索引（两次！），用于表示两个枚举值的映射。例如，这个程序使用这样的一个数组来映射两个状态到一个状态的转换过程（液体到固体是冻结的，液体到气体是沸腾的，等等）：
 
-```
+```java
 // Using ordinal() to index array of arrays - DON'T DO THIS!
 public enum Phase {
     SOLID, LIQUID, GAS;
@@ -153,13 +156,13 @@ public enum Phase {
 
 This program works and may even appear elegant, but appearances can be deceiving. Like the simpler garden example shown earlier, the compiler has no way of knowing the relationship between ordinals and array indices. If you make a mistake in the transition table or forget to update it when you modify the Phase or Phase.Transition enum type, your program will fail at runtime. The failure may be an ArrayIndexOutOfBoundsException, a NullPointerException, or (worse) silent erroneous behavior. And the size of the table is quadratic in the number of phases, even if the number of non-null entries is smaller.
 
-这个程序可以工作，甚至可能看起来很优雅，但外表可能具有欺骗性。就像前面展示的更简单的 garden 示例一样，编译器无法知道序数和数组索引之间的关系。如果你在转换表中出错，或者在修改 Phase 或 `Phase.Transition` 枚举类型时忘记更新，你的程序将在运行时失败。失败可能是抛出 ArrayIndexOutOfBoundsException、NullPointerException 或（更糟糕的）静默错误行为。并且即使非空项的数目更小，该表的大小也为状态数量的二次方。
+这个程序可以工作，甚至可能看起来很优雅，但外表可能具有欺骗性。就像前面展示的更简单的 garden 示例一样，编译器无法知道序数和数组索引之间的关系。如果你在转换表中出错，或者在修改 Phase 或 `Phase.Transition` 枚举类型时忘记更新，你的程序将在运行时失败。失败可能是抛出 ArrayIndexOutOfBoundsException、NullPointerException 或（更糟糕的）静默错误行为。并且即使非空项的数目很小，该表的大小也为状态数量的平方。
 
 Again, you can do much better with EnumMap. Because each phase transition is indexed by a pair of phase enums, you are best off representing the relationship as a map from one enum (the “from” phase) to a map from the second enum (the “to” phase) to the result (the phase transition). The two phases associated with a phase transition are best captured by associating them with the phase transition enum, which can then be used to initialize the nested EnumMap:
 
 同样，使用 EnumMap 可以做得更好。因为每个阶段转换都由一对阶段枚举索引，所以最好将这个关系用 Map 表示，从一个枚举（起始阶段）到第二个枚举（结束阶段）到结果（转换阶段）。与阶段转换相关联的两个阶段最容易捕捉到的是将它们与阶段过渡的 enum 联系起来，这样就可以用来初始化嵌套的 EnumMap：
 
-```
+```java
 // Using a nested EnumMap to associate data with enum pairs
 public enum Phase {
     SOLID, LIQUID, GAS;
@@ -177,11 +180,11 @@ public enum Phase {
         }
 
         // Initialize the phase transition map
-        private static final Map<Phase_new, Map<Phase_new, Transition>> m = Stream.of(values())
+        private static final Map<Phase, Map<Phase, Transition>> m = Stream.of(values())
                 .collect(groupingBy(
                         t -> t.from,
-                        () -> new EnumMap<>(Phase_new.class),
-                        toMap(t -> t.to, t -> t, (x, y) -> y, () -> new EnumMap<>(Phase_new.class))
+                        () -> new EnumMap<>(Phase.class),
+                        toMap(t -> t.to, t -> t, (x, y) -> y, () -> new EnumMap<>(Phase.class))
                         )
                 );
 
@@ -197,7 +200,8 @@ The code to initialize the phase transition map is a bit complicated. The type o
 初始化阶段变化 Map 的代码有点复杂。Map 的类型是 `Map<Phase, Map<Phase, Transition>>`，这意味着「从（源）阶段 Map 到（目标）阶段 Map 的转换过程」。这个 Map 嵌套是使用两个收集器的级联序列初始化的。第一个收集器按源阶段对转换进行分组，第二个收集器使用从目标阶段到转换的映射创建一个 EnumMap。第二个收集器 ((x, y) -> y) 中的 merge 函数未使用；之所以需要它，只是因为我们需要指定一个 Map 工厂来获得 EnumMap，而 Collector 提供了伸缩工厂。本书的上一个版本使用显式迭代来初始化阶段转换映射。代码更冗长，但也更容易理解。
 
 **译注：第二版中的实现代码如下：**
-```
+
+```java
 // Initialize the phase transition map
 private static final Map<Phase, Map<Phase,Transition> m =
     new EnumMap<Phase, Map<Phase ,Transition>>(Phase.class);
