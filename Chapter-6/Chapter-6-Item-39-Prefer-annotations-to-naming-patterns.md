@@ -18,7 +18,7 @@ Annotations [JLS, 9.7] solve all of these problems nicely, and JUnit adopted the
 
 注解 [JLS, 9.7] 很好地解决了所有这些问题，JUnit 从版本 4 开始就采用了它们。在本条目中，我们将编写自己的示例测试框架来展示注解是如何工作的。假设你希望定义注解类型，以指定自动运行的简单测试，并在抛出异常时失败。下面是这种名为 Test 的注解类型的概貌：
 
-```
+```java
 // Marker annotation type declaration
 import java.lang.annotation.*;
 
@@ -40,6 +40,7 @@ Test 注解类型的声明本身带有 Retention 注解和 Target 注解。这�
 **译注 1：注解的保留策略**
 
 保留策略决定了在什么位置丢弃注解。Java 定义了 3 种策略，它们被封装到 `java.lang.annotation.RetentionPolicy` 枚举中。这 3 种策略分别是 SOURCE、CLASS 和 RUNTIME。
+
 - 使用 SOURCE 保留策略的注解，只在源文件中保留，在编译期间会被抛弃。
 - 使用 CLASS 保留策略的注解，在编译时被存储到 `.class` 文件中。但是，在运行时不能通过 JVM 得到这些注解。
 - 使用 RUNTIME 保留策略的注解，在编译时被存储到 `.class` 文件中，并且在运行时可以通过 JVM 获取这些注解。因此，RUNTIME 保留策略提供了最永久的注解。
@@ -74,13 +75,13 @@ Test 注解类型的声明本身带有 Retention 注解和 Target 注解。这�
 
 The comment before the Test annotation declaration says, “Use only on parameterless static methods.” It would be nice if the compiler could enforce this, but it can’t, unless you write an annotation processor to do so. For more on this topic, see the documentation for javax.annotation.processing. In the absence of such an annotation processor, if you put a Test annotation on the declaration of an instance method or on a method with one or more parameters, the test program will still compile, leaving it to the testing tool to deal with the problem at runtime.
 
-Test 注解声明之前的代码注释是这么描述的:「Use only on parameterless static methods.（只对无参数的静态方法使用）」如果编译器能够强制执行这一点，那就太好了，但是它不能，除非你编写代码注释处理器来执行。有关此主题的更多信息，请参阅 `javax.annotation.processing` 的文档。在没有这样的代码注释处理程序的情况下，如果你将 Test 注解放在实例方法的声明上，或者放在带有一个或多个参数的方法上，测试程序仍然会编译，让测试工具在运行时处理。
+Test 注解声明的代码注释是这么描述的:「Use only on parameterless static methods.（只对无参数的静态方法使用）」如果编译器能够强制执行这一点，那就太好了，但是它不能，除非你编写代码注释处理器来执行。有关此主题的更多信息，请参阅 `javax.annotation.processing` 的文档。在没有这样的代码注释处理程序的情况下，如果你将 Test 注解放在实例方法的声明上，或者放在带有一个或多个参数的方法上，测试程序仍然会编译，让测试工具在运行时处理。
 
 Here is how the Test annotation looks in practice. It is called a marker annotation because it has no parameters but simply “marks” the annotated element. If the programmer were to misspell Test or to apply the Test annotation to a program element other than a method declaration, the program wouldn’t compile:
 
 下面是 Test 注解实际使用时的样子。它被称为标记注解，因为它没有参数，只是对带注解的元素进行「标记」。如果程序员拼错 Test 或将 Test 注解应用于除方法声明之外的程序元素，程序将无法编译：
 
-```
+```java
 // Program containing marker annotations
 public class Sample {
     @Test
@@ -117,7 +118,7 @@ The Test annotations have no direct effect on the semantics of the Sample class.
 
 Test 注解对 Sample 类的语义没有直接影响。它们仅用于向相关程序提供信息。更普遍的是，注解不会改变被注解代码的语义，而是通过工具（就像如下这个简单的 RunTests 类）对其进行特殊处理：
 
-```
+```java
 // Program to process marker annotations
 import java.lang.reflect.*;
 
@@ -153,7 +154,7 @@ If an attempt to invoke a test method by reflection throws any exception other t
 
 如果通过反射调用测试方法时抛出除 InvocationTargetException 之外的任何异常，则表明在编译时存在未捕获的 Test 注解的无效用法。这些用途包括实例方法的注解、带有一个或多个参数的方法的注解或不可访问方法的注解。测试运行程序中的第二个 catch 块捕获这些 Test 使用错误并打印对应的错误消息。如果在 Sample 上运行 RunTests，输出如下：
 
-```
+```java
 public static void Sample.m3() failed: RuntimeException: Boom
 Invalid @Test: public void Sample.m5()
 public static void Sample.m7() failed: RuntimeException: Crash
@@ -164,7 +165,7 @@ Now let’s add support for tests that succeed only if they throw a particular e
 
 现在让我们添加一个只在抛出特定异常时才成功的测试支持。我们需要一个新的注解类型：
 
-```
+```java
 // Annotation type with a parameter
 import java.lang.annotation.*;
 
@@ -181,9 +182,9 @@ public @interface ExceptionTest {
 
 The type of the parameter for this annotation is `Class<? extends Throwable>`. This wildcard type is, admittedly, a mouthful. In English, it means “the Class object for some class that extends Throwable,” and it allows the user of the annotation to specify any exception (or error) type. This usage is an example of a bounded type token (Item 33). Here’s how the annotation looks in practice. Note that class literals are used as the values for the annotation parameter:
 
-这个注解的参数类型是 `Class<? extends Throwable>`，这个通配符类型确实很复杂。在英语中，它的意思是「某个扩展自 Throwable 的类的 Class 对象」，它允许注解的用户指定任何异常（或错误）类型。这种用法是有界类型令牌（[Item-33](/Chapter-5/Chapter-5-Item-33-Consider-typesafe-heterogeneous-containers.md)）的一个示例。下面是这个注解在实际应用时的样子。注意，类的字面量被用作注解参数的值：
+这个注解的参数类型是 `Class<? extends Throwable>`，这个通配符类型确实很复杂。在英语中，它的意思是「某个扩展自 Throwable 的类的 Class 对象」，它允许注解的用户指定任何异常（或错误）类型。这种用法是有界类型标记（[Item-33](/Chapter-5/Chapter-5-Item-33-Consider-typesafe-heterogeneous-containers.md)）的一个示例。下面是这个注解在实际应用时的样子。注意，类的字面量被用作注解参数的值：
 
-```
+```java
 // Program containing annotations with a parameter
 public class Sample2 {
     @ExceptionTest(ArithmeticException.class)
@@ -207,7 +208,7 @@ Now let’s modify the test runner tool to process the new annotation. Doing so 
 
 现在让我们修改 test runner 工具来处理新的注解。向 main 方法添加以下代码：
 
-```
+```java
 if (m.isAnnotationPresent(ExceptionTest.class)) {
     tests++;
     try {
@@ -236,7 +237,7 @@ Taking our exception testing example one step further, it is possible to envisio
 
 进一步修改我们的异常测试示例，如果它抛出几个指定异常中的任意一个，那么可以认为测试通过了。注解机制具有一种工具，可以轻松地支持这种用法。假设我们将 ExceptionTest 注解的参数类型更改为一个 Class 对象数组：
 
-```
+```java
 // Annotation type with an array parameter
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -249,7 +250,7 @@ The syntax for array parameters in annotations is flexible. It is optimized for 
 
 注解中数组参数的语法是灵活的。它针对单元素数组进行了优化。前面的 ExceptionTest 注解对于 ExceptionTest 的新数组参数版本仍然有效，并且可以生成单元素数组。要指定一个多元素数组，用花括号包围元素，并用逗号分隔它们：
 
-```
+```java
 // Code containing an annotation with an array parameter
 @ExceptionTest({ IndexOutOfBoundsException.class,NullPointerException.class })
 public static void doublyBad() {
@@ -264,7 +265,7 @@ It is reasonably straightforward to modify the test runner tool to process the n
 
 修改测试运行器工具来处理 ExceptionTest 的新版本是相当简单的。这段代码替换了原来的版本：
 
-```
+```java
 if (m.isAnnotationPresent(ExceptionTest.class)) {
     tests++;
     try {
@@ -290,7 +291,7 @@ As of Java 8, there is another way to do multivalued annotations. Instead of dec
 
 在 Java 8 中，还有另一种方法可以执行多值注解。你可以在注解声明上使用 `@Repeatable` 元注解，以表明注解可以重复地应用于单个元素，而不是使用数组参数来声明注解类型。这个元注解只接受一个参数，这个参数是包含注解类型的类对象，它的唯一参数是注解类型的数组 [JLS, 9.6.3]。如果我们对 ExceptionTest 注解采用这种方法，那么注解声明是这样的。注意，包含的注解类型必须使用适当的 Retention 注解和 Target 注解，否则声明将无法编译：
 
-```
+```java
 // Repeatable annotation type
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -310,7 +311,7 @@ Here’s how our doublyBad test looks with a repeated annotation in place of an 
 
 下面是使用重复注解代替数组值注解的 doublyBad 测试：
 
-```
+```java
 // Code containing a repeated annotation
 @ExceptionTest(IndexOutOfBoundsException.class)
 @ExceptionTest(NullPointerException.class)
@@ -321,7 +322,7 @@ Processing repeatable annotations requires care. A repeated annotation generates
 
 处理可重复注解需要小心。「重复状态」会生成名为「容器注解类型」的合成注解。getAnnotationsByType 方法可忽略这一区别，它可以用于访问可重复注解类型的「重复状态」和「非重复状态」。但是 isAnnotationPresent 明确指出，「重复状态」的情况不属于注解类型，而是「容器注解类型」。如果一个元素是某种类型的「重复状态」注解，并且你使用 isAnnotationPresent 方法检查该元素是否具有该类型的注解，你将发现它提示不存在。因此，使用此方法检查注解类型的存在与否，将导致你的程序忽略「重复状态」。类似地，使用此方法检查「容器注解类型」将导致程序忽略「非重复状态」。要使用 isAnnotationPresent 检测「重复状态」和「非重复状态」，需要同时检查注解类型及其「容器注解类型」。下面是我们的 RunTests 程序的相关部分修改为使用 ExceptionTest 注解的可重复版本时的样子：
 
-```
+```java
 // Processing repeatable annotations
 if (m.isAnnotationPresent(ExceptionTest.class)|| m.isAnnotationPresent(ExceptionTestContainer.class)) {
     tests++;
@@ -347,7 +348,8 @@ if (m.isAnnotationPresent(ExceptionTest.class)|| m.isAnnotationPresent(Exception
 **译注：比较原文中提及的 getAnnotationsByType 与 isAnnotationPresent 在可重复注解的「重复状态」和「非重复状态」下的使用差别：**
 
 **原 doublyBad 方法不变，属于「重复状态」（重复注解大于等于两个的，都属于「重复状态」）；新增一个 doublyBad2 方法，仅使用一个重复注解，属于「非重复状态」**
-```
+
+```java
 class Simple4 {
     // Code containing a repeated annotation
     @ExceptionTest(IndexOutOfBoundsException.class)
@@ -360,8 +362,10 @@ class Simple4 {
     }
 }
 ```
+
 **测试代码**
-```
+
+```java
 public static void main(String[] args) throws NoSuchMethodException {
     Class<?> testClass = Simple4.class;
     for (int count = 1; count <= 2; count++) {
@@ -375,8 +379,10 @@ public static void main(String[] args) throws NoSuchMethodException {
     }
 }
 ```
+
 **结果**
-```
+
+```java
 doublyBad「重复状态」：false
 doublyBad「容器注解类型」：true
 doublyBad「非重复状态」：false
@@ -406,5 +412,6 @@ That said, with the exception of toolsmiths, most programmers will have no need 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-6/Chapter-6-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 38: Emulate extensible enums with interfaces（使用接口模拟可扩展枚举）](/Chapter-6/Chapter-6-Item-38-Emulate-extensible-enums-with-interfaces.md)**
 - **Next Item（下一条目）：[Item 40: Consistently use the Override annotation（坚持使用 @Override 注解）](/Chapter-6/Chapter-6-Item-40-Consistently-use-the-Override-annotation.md)**
