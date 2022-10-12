@@ -8,11 +8,11 @@ The streams API was added in Java 8 to ease the task of performing bulk operatio
 
 A stream pipeline consists of a source stream followed by zero or more intermediate operations and one terminal operation. Each intermediate operation transforms the stream in some way, such as mapping each element to a function of that element or filtering out all elements that do not satisfy some condition. Intermediate operations all transform one stream into another, whose element type may be the same as the input stream or different from it. The terminal operation performs a final computation on the stream resulting from the last intermediate operation, such as storing its elements into a collection, returning a certain element, or printing all of its elements.
 
-流管道由源流、零个或多个 Intermediate 操作和一个 Terminal 操作组成。每个 Intermediate 操作以某种方式转换流，例如将每个元素映射到该元素的一个函数，或者过滤掉不满足某些条件的所有元素。中间操作都将一个流转换为另一个流，其元素类型可能与输入流相同，也可能与输入流不同。Terminal 操作对最后一次 Intermediate 操作所产生的流进行最终计算，例如将其元素存储到集合中、返回特定元素、或打印其所有元素。
+流管道由源流跟着零个或多个中间操作和一个终止操作组成。每个中间操作以某种方式转换流，例如将每个元素映射到该元素的一个函数，或者过滤掉不满足某些条件的所有元素。中间操作都将一个流转换为另一个流，其元素类型可能与输入流相同，也可能与输入流不同。终止操作对最后一次中间操作所产生的流进行最终计算，例如将其元素存储到集合中、返回特定元素、或打印其所有元素。
 
 Stream pipelines are evaluated lazily: evaluation doesn’t start until the terminal operation is invoked, and data elements that aren’t required in order to complete the terminal operation are never computed. This lazy evaluation is what makes it possible to work with infinite streams. Note that a stream pipeline without a terminal operation is a silent no-op, so don’t forget to include one.
 
-流管道的计算是惰性的：直到调用 Terminal 操作时才开始计算，并且对完成 Terminal 操作不需要的数据元素永远不会计算。这种惰性的求值机制使得处理无限流成为可能。请注意，没有 Terminal 操作的流管道是无动作的，因此不要忘记包含一个 Terminal 操作。
+流管道的计算是惰性的：直到调用终止操作时才开始计算，并且对完成终止操作不需要的数据元素永远不会计算。这种惰性的求值机制使得处理无限流成为可能。请注意，没有终止操作的流管道是无动作的，因此不要忘记包含一个终止操作。
 
 The streams API is fluent: it is designed to allow all of the calls that comprise a pipeline to be chained into a single expression. In fact, multiple pipelines can be chained together into a single expression.
 
@@ -30,7 +30,7 @@ Consider the following program, which reads the words from a dictionary file and
 
 考虑下面的程序，它从字典文件中读取单词并打印所有大小满足用户指定最小值的变位组。回想一下，如果两个单词以不同的顺序由相同的字母组成，那么它们就是字谜。该程序从用户指定的字典文件中读取每个单词，并将这些单词放入一个 Map 中。Map 的键是按字母顺序排列的单词，因此「staple」的键是「aelpst」，而「petals」的键也是「aelpst」：这两个单词是字谜，所有的字谜都有相同的字母排列形式（有时称为字母图）。Map 的值是一个列表，其中包含共享按字母顺序排列的表单的所有单词。在字典被处理之后，每个列表都是一个完整的字谜组。然后，该程序遍历 Map 的 values() 视图，并打印大小满足阈值的每个列表：
 
-```
+```java
 // Prints all large anagram groups in a dictionary iteratively
 public class Anagrams {
     public static void main(String[] args) throws IOException {
@@ -64,7 +64,7 @@ Now consider the following program, which solves the same problem, but makes hea
 
 现在考虑下面的程序，它解决了相同的问题，但是大量使用了流。注意，除了打开字典文件的代码之外，整个程序都包含在一个表达式中。在单独的表达式中打开字典的唯一原因是允许使用 `try with-resources` 语句，该语句确保字典文件是关闭的：
 
-```
+```java
 // Overuse of streams - don't do this!
 public class Anagrams {
     public static void main(String[] args) throws IOException {
@@ -88,7 +88,7 @@ If you find this code hard to read, don’t worry; you’re not alone. It is sho
 
 如果你发现这段代码难以阅读，不要担心；不单是你有这样的感觉。它虽然更短，但可读性也更差，特别是对于不擅长流使用的程序员来说。过度使用流会使得程序难以读取和维护。幸运的是，有一个折衷的办法。下面的程序解决了相同的问题，在不过度使用流的情况下使用流。结果，这个程序比原来的程序更短，也更清晰：
 
-```
+```java
 // Tasteful use of streams enhances clarity and conciseness
 public class Anagrams {
     public static void main(String[] args) throws IOException {
@@ -107,7 +107,7 @@ public class Anagrams {
 
 Even if you have little previous exposure to streams, this program is not hard to understand. It opens the dictionary file in a try-with-resources block, obtaining a stream consisting of all the lines in the file. The stream variable is named words to suggest that each element in the stream is a word. The pipeline on this stream has no intermediate operations; its terminal operation collects all the words into a map that groups the words by their alphabetized form (Item 46). This is exactly the same map that was constructed in both previous versions of the program. Then a new `Stream<List<String>>` is opened on the values() view of the map. The elements in this stream are, of course, the anagram groups. The stream is filtered so that all of the groups whose size is less than minGroupSize are ignored, and finally, the remaining groups are printed by the terminal operation forEach.
 
-即使你以前很少接触流，这个程序也不难理解。它在带有资源的 try 块中打开字典文件，获得由文件中所有行组成的流。流变量名为 words，表示流中的每个元素都是一个单词。此流上的管道没有 Intermediate 操作；它的 Terminal 操作将所有单词收集到一个 Map 中，该 Map 按字母顺序将单词分组（[Item-46](/Chapter-7/Chapter-7-Item-46-Prefer-side-effect-free-functions-in-streams.md)）。这与在程序的前两个版本中构造的 Map 完全相同。然后在 Map 的 values() 视图上打开一个新的 `Stream<List<String>>`。这个流中的元素当然是字谜组。对流进行过滤，以便忽略所有大小小于 minGroupSize 的组，最后，Terminal 操作 forEach 打印其余组。
+即使你以前很少接触流，这个程序也不难理解。它在 try-with-resources 块中打开字典文件，获得由文件中所有行组成的流。流变量名为 words，表示流中的每个元素都是一个单词。此流上的管道没有中间操作；它的终止操作将所有单词收集到一个 Map 中，该 Map 按字母顺序将单词分组（[Item-46](/Chapter-7/Chapter-7-Item-46-Prefer-side-effect-free-functions-in-streams.md)）。这与在程序的前两个版本中构造的 Map 完全相同。然后在 Map 的 values() 视图上打开一个新的 `Stream<List<String>>`。这个流中的元素当然是字谜组。对流进行过滤，以便忽略所有大小小于 minGroupSize 的组，最后，终止操作 forEach 打印其余组。
 
 Note that the lambda parameter names were chosen carefully. The parameter g should really be named group, but the resulting line of code would be too wide for the book. **In the absence of explicit types, careful naming of lambda parameters is essential to the readability of stream pipelines.**
 
@@ -121,7 +121,7 @@ The alphabetize method could have been reimplemented to use streams, but a strea
 
 本来可以重新实现字母顺序方法来使用流，但是基于流的字母顺序方法就不那么清晰了，更难于正确地编写，而且可能会更慢。这些缺陷是由于 Java 不支持基本字符流（这并不意味着 Java 应该支持字符流；这样做是不可行的）。要演示使用流处理 char 值的危害，请考虑以下代码：
 
-```
+```java
 "Hello world!".chars().forEach(System.out::print);
 ```
 
@@ -129,7 +129,7 @@ You might expect it to print Hello world!, but if you run it, you’ll find that
 
 你可能希望它打印 Hello world!，但如果运行它，你会发现它打印 721011081081113211911111410810033。这是因为 `"Hello world!".chars()` 返回的流元素不是 char 值，而是 int 值，因此调用了 print 的 int 重载。无可否认，一个名为 chars 的方法返回一个 int 值流是令人困惑的。你可以通过强制调用正确的重载来修复程序：
 
-```
+```java
 "Hello world!".chars().forEach(x -> System.out.print((char) x));
 ```
 
@@ -183,9 +183,9 @@ One thing that is hard to do with streams is to access corresponding elements fr
 
 For example, let’s write a program to print the first twenty Mersenne primes. To refresh your memory, a Mersenne number is a number of the form 2p − 1. If p is prime, the corresponding Mersenne number may be prime; if so, it’s a Mersenne prime. As the initial stream in our pipeline, we want all the prime numbers. Here’s a method to return that (infinite) stream. We assume a static import has been used for easy access to the static members of BigInteger:
 
-例如，让我们编写一个程序来打印前 20 个 Mersenne 素数。刷新你的记忆,一个 Mersenne 素数的数量是一个数字形式 2p − 1。如果 p 是素数，对应的 Mersenne 数可以是素数；如果是的话，这就是 Mersenne 素数。作为管道中的初始流，我们需要所有质数。这里有一个返回（无限）流的方法。我们假设已经使用静态导入来方便地访问 BigInteger 的静态成员：
+例如，让我们编写一个程序来打印前 20 个 Mersenne 素数。帮你回忆一下,一个 Mersenne 素数的数量是一个数字形式 $2^{p} − 1$。如果 p 是素数，对应的 Mersenne 数可能是素数；如果是素数的话，这就是 Mersenne 素数。作为管道中的初始流，我们需要所有质数。这里有一个返回（无限）流的方法。我们假设已经使用静态导入来方便地访问 BigInteger 的静态成员：
 
-```
+```java
 static Stream<BigInteger> primes() {
     return Stream.iterate(TWO, BigInteger::nextProbablePrime);
 }
@@ -193,7 +193,7 @@ static Stream<BigInteger> primes() {
 
 The name of the method (primes) is a plural noun describing the elements of the stream. This naming convention is highly recommended for all methods that return streams because it enhances the readability of stream pipelines. The method uses the static factory Stream.iterate, which takes two parameters: the first element in the stream, and a function to generate the next element in the stream from the previous one. Here is the program to print the first twenty Mersenne primes:
 
-方法的名称（素数）是描述流元素的复数名词。强烈推荐所有返回流的方法使用这种命名约定，因为它增强了流管道的可读性。该方法使用静态工厂 `Stream.iterate`，它接受两个参数：流中的第一个元素和一个函数，用于从前一个元素生成流中的下一个元素。下面是打印前 20 个 Mersenne 素数的程序：
+方法的名称（primes）是描述流元素的复数名词。强烈推荐所有返回流的方法使用这种命名约定，因为它增强了流管道的可读性。该方法使用静态工厂 `Stream.iterate`，它接受两个参数：流中的第一个元素和一个函数，用于从前一个元素生成流中的下一个元素。下面是打印前 20 个 Mersenne 素数的程序：
 
 ```
 public static void main(String[] args) {
@@ -206,13 +206,13 @@ public static void main(String[] args) {
 
 This program is a straightforward encoding of the prose description above: it starts with the primes, computes the corresponding Mersenne numbers, filters out all but the primes (the magic number 50 controls the probabilistic primality test), limits the resulting stream to twenty elements, and prints them out.
 
-这个程序是上述散文描述的一个简单编码：它从素数开始，计算相应的 Mersenne 数，过滤掉除素数以外的所有素数（魔法数字 50 控制概率素数测试），将结果流限制为 20 个元素，并打印出来。
+这个程序是上述话语描述的一个简单编码：它从素数开始，计算相应的 Mersenne 数，过滤掉所有合数（魔法数字 50 控制素数测试成功的概率），将结果流限制为 20 个元素，并打印出来。
 
 Now suppose that we want to precede each Mersenne prime with its exponent (p). This value is present only in the initial stream, so it is inaccessible in the terminal operation, which prints the results. Luckily, it’s easy to compute the exponent of a Mersenne number by inverting the mapping that took place in the first intermediate operation. The exponent is simply the number of bits in the binary representation, so this terminal operation generates the desired result:
 
-现在假设我们想要在每个 Mersenne 素数之前加上它的指数 (p)，这个值只在初始流中存在，因此在输出结果的终端操作中是不可访问的。幸运的是，通过对第一个中间操作中发生的映射求逆，可以很容易地计算出 Mersenne 数的指数。指数仅仅是二进制表示的比特数，因此这个终端操作产生了想要的结果：
+现在假设我们想要在每个 Mersenne 素数之前加上它的指数 (p)，这个值只在初始流中存在，因此在输出结果的终端操作中是不可访问的。幸运的是，通过对第一个中间操作中发生的映射求逆，可以很容易地计算出 Mersenne 数的指数。指数仅仅是二进制表示的比特数，因此这个终止操作产生了想要的结果：
 
-```
+```java
 .forEach(mp -> System.out.println(mp.bitLength() + ": " + mp));
 ```
 
@@ -220,13 +220,13 @@ There are plenty of tasks where it is not obvious whether to use streams or iter
 
 在许多任务中，使用流还是迭代并不明显。例如，考虑初始化一副新纸牌的任务。假设 Card 是一个不可变的值类，它封装了 Rank 和 Suit，它们都是 enum 类型。此任务代表需要计算可从两个集合中选择的所有元素对的任何任务。数学家称之为这两个集合的笛卡尔积。下面是一个嵌套 for-each 循环的迭代实现，你应该非常熟悉它：
 
-```
+```java
 // Iterative Cartesian product computation
 private static List<Card> newDeck() {
     List<Card> result = new ArrayList<>();
     for (Suit suit : Suit.values())
-    for (Rank rank : Rank.values())
-    result.add(new Card(suit, rank));
+        for (Rank rank : Rank.values())
+            result.add(new Card(suit, rank));
     return result;
 }
 ```
@@ -235,13 +235,13 @@ And here is a stream-based implementation that makes use of the intermediate ope
 
 这是一个基于流的实现，它使用了中间操作 flatMap。此操作将流中的每个元素映射到流，然后将所有这些新流连接到单个流中（或将其扁平化）。注意，这个实现包含一个嵌套 lambda 表达式，用粗体显示:
 
-```
+```java
 // Stream-based Cartesian product computation
 private static List<Card> newDeck() {
     return Stream.of(Suit.values())
-    .flatMap(suit ->Stream.of(Rank.values())
-    .map(rank -> new Card(suit, rank)))
-    .collect(toList());
+        .flatMap(suit ->Stream.of(Rank.values())
+        .map(rank -> new Card(suit, rank)))
+        .collect(toList());
 }
 ```
 
@@ -255,5 +255,6 @@ In summary, some tasks are best accomplished with streams, and others with itera
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-7/Chapter-7-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 44: Favor the use of standard functional interfaces（优先使用标准函数式接口）](/Chapter-7/Chapter-7-Item-44-Favor-the-use-of-standard-functional-interfaces.md)**
 - **Next Item（下一条目）：[Item 46: Prefer side effect free functions in streams（在流中使用无副作用的函数）](/Chapter-7/Chapter-7-Item-46-Prefer-side-effect-free-functions-in-streams.md)**
