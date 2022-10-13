@@ -111,7 +111,7 @@ The three-argument form of toMap is also useful to make a map from a key to a ch
 
 toMap 的三参数形式对于从键到与该键关联的所选元素的映射也很有用。例如，假设我们有一个由不同艺术家录制的唱片流，并且我们想要一个从唱片艺术家到畅销唱片的映射。这个 collector 将完成这项工作。
 
-```
+```java
 // Collector to generate a map from key to chosen element for key
 Map<Artist, Album> topHits = albums.collect(
         toMap(Album::artist, a->a, maxBy(comparing(Album::sales)
@@ -127,7 +127,7 @@ Another use of the three-argument form of toMap is to produce a collector that i
 
 toMap 的三参数形式的另一个用途是生成一个 collector，当发生冲突时，它强制执行 last-write-wins 策略。对于许多流，结果将是不确定的，但如果映射函数可能与键关联的所有值都是相同的，或者它们都是可接受的，那么这个 collector 的行为可能正是你想要的：
 
-```
+```java
 // Collector to impose last-write-wins policy
 toMap(keyMapper, valueMapper, (v1, v2) -> v2)
 ```
@@ -142,9 +142,9 @@ There are also variant forms of the first three versions of toMap, named toConcu
 
 In addition to the toMap method, the Collectors API provides the groupingBy method, which returns collectors to produce maps that group elements into categories based on a classifier function. The classifier function takes an element and returns the category into which it falls. This category serves as the element’s map key. The simplest version of the groupingBy method takes only a classifier and returns a map whose values are lists of all the elements in each category. This is the collector that we used in the Anagram program in Item 45 to generate a map from alphabetized word to a list of the words sharing the alphabetization:
 
-除了 toMap 方法之外，collector API 还提供 groupingBy 方法，该方法返回 collector，以生成基于分类器函数将元素分组为类别的映射。分类器函数接受一个元素并返回它所属的类别。这个类别用作元素的 Map 键。groupingBy 方法的最简单版本只接受一个分类器并返回一个 Map，其值是每个类别中所有元素的列表。这是我们在 [Item-45](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md) 的字谜程序中使用的收集器，用于生成从按字母顺序排列的单词到共享字母顺序的单词列表的映射：
+除了 toMap 方法之外，Collectors API 还提供 groupingBy 方法，该方法返回 collector，以生成基于分类器函数将元素分组为类别的映射。分类器函数接受一个元素并返回它所属的类别。这个类别用作元素的 Map 键。groupingBy 方法的最简单版本只接受一个分类器并返回一个 Map，其值是每个类别中所有元素的列表。这是我们在 [Item-45](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md) 的字谜程序中使用的收集器，用于生成从按字母顺序排列的单词到共享字母顺序的单词列表的映射：
 
-```
+```java
 words.collect(groupingBy(word -> alphabetize(word)))
 ```
 
@@ -156,7 +156,7 @@ Alternatively, you can pass toCollection(collectionFactory), which lets you crea
 
 或者，你可以传递 `toCollection(collectionFactory)`，它允许你创建集合，将每个类别的元素放入其中。这使你可以灵活地选择所需的任何集合类型。groupingBy 的两参数形式的另一个简单用法是将 `counting()` 作为下游收集器传递。这将生成一个 Map，该 Map 将每个类别与类别中的元素数量相关联，而不是包含元素的集合。这是你在这一项开始的 freq 表例子中看到的：
 
-```
+```java
 Map<String, Long> freq = words.collect(groupingBy(String::toLowerCase, counting()));
 ```
 
@@ -182,7 +182,7 @@ The final Collectors method is joining, which operates only on streams of CharSe
 
 In summary, the essence of programming stream pipelines is side-effect-free function objects. This applies to all of the many function objects passed to streams and related objects. The terminal operation forEach should only be used to report the result of a computation performed by a stream, not to perform the computation. In order to use streams properly, you have to know about collectors. The most important collector factories are toList, toSet, toMap, groupingBy, and joining.
 
-总之，流管道编程的本质是无副作用的函数对象。这适用于传递给流和相关对象的所有函数对象。Terminal 操作 forEach 只应用于报告由流执行的计算结果，而不应用于执行计算。为了正确使用流，你必须了解 collector。最重要的 collector 工厂是 toList、toSet、toMap、groupingBy 和 join。
+总之，流管道编程的本质是无副作用的函数对象。这适用于传递给流和相关对象的所有函数对象。中间操作 forEach 只应用于报告由流执行的计算结果，而不应用于执行计算。为了正确使用流，你必须了解 collector。最重要的 collector 工厂是 toList、toSet、toMap、groupingBy 和 join。
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-7/Chapter-7-Introduction.md)**
