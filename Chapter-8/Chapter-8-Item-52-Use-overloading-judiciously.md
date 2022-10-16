@@ -6,7 +6,7 @@ The following program is a well-intentioned attempt to classify collections acco
 
 下面的程序是一个善意的尝试，根据一个 Collection 是 Set、List 还是其他的集合类型来进行分类：
 
-```
+```java
 // Broken! - What does this program print?
 public class CollectionClassifier {
     public static String classify(Set<?> s) {
@@ -79,7 +79,7 @@ public static String classify(Collection<?> c) {
 
 Because overriding is the norm and overloading is the exception, overriding sets people’s expectations for the behavior of method invocation. As demonstrated by the CollectionClassifier example, overloading can easily confound these expectations. It is bad practice to write code whose behavior is likely to confuse programmers. This is especially true for APIs. If the typical user of an API does not know which of several method overloadings will get invoked for a given set of parameters, use of the API is likely to result in errors. These errors will likely manifest themselves as erratic behavior at runtime, and many programmers will have a hard time diagnosing them. Therefore you should **avoid confusing uses of overloading.**
 
-因为重写是常态，而重载是例外，所以覆盖满足了人们对方法调用行为的期望。正如 CollectionClassifier 示例所示，重载很容易混淆这些期望。编写可能使程序员感到困惑的代码是不好的行为。对于 API 尤其如此。如果 API 的用户不知道一组参数应该调用哪一种方法重载，那么使用 API 时很可能会导致错误。这些错误很可能在运行时表现为不稳定的行为，许多程序员将很难诊断它们。因此，**应该避免混淆重载的用法。**
+因为重写是常态，而重载是例外，所以重写满足了人们对方法调用行为的期望。正如 CollectionClassifier 示例所示，重载很容易混淆这些期望。编写可能使程序员感到困惑的代码是不好的行为。对于 API 尤其如此。如果 API 的用户不知道一组参数应该调用哪一种方法重载，那么使用 API 时很可能会导致错误。这些错误很可能在运行时表现为不稳定的行为，许多程序员将很难诊断它们。因此，**应该避免混淆重载的用法。**
 
 Exactly what constitutes a confusing use of overloading is open to some debate. **A safe, conservative policy is never to export two overloadings with the same number of parameters.** If a method uses varargs, a conservative policy is not to overload it at all, except as described in Item 53. If you adhere to these restrictions, programmers will never be in doubt as to which overloading applies to any set of actual parameters. These restrictions are not terribly onerous because **you can always give methods different names instead of overloading them.**
 
@@ -101,7 +101,7 @@ Prior to Java 5, all primitive types were radically different from all reference
 
 在 Java 5 之前，所有原始类型都与所有引用类型完全不同，但在自动装箱时并非如此，这造成了真正的麻烦。考虑以下方案：
 
-```
+```java
 public class SetList {
 public static void main(String[] args) {
     Set<Integer> set = new TreeSet<>();
@@ -127,18 +127,18 @@ Here’s what’s happening: The call to set.remove(i) selects the overloading r
 
 实际情况如下：调用 `set.remove(i)` 选择重载 `remove(E)`，其中 E 是 set （Integer）的元素类型，而将从 int 自动装箱到 Integer 中。这是你期望的行为，因此程序最终会从 Set 中删除正值。另一方面，对 `list.remove(i)` 的调用选择重载 `remove(int i)`，它将删除 List 中指定位置的元素。如果从 List `[-3，-2，-1,0,1,2]` 开始，移除第 0 个元素，然后是第 1 个，然后是第 2 个，就只剩下 `[-2,0,2]`，谜底就解开了。若要修复此问题，要将 `list.remove` 的参数转换成 Integer，强制选择正确的重载。或者，你可以调用 `Integer.valuef()`，然后将结果传递给 `list.remove`。无论哪种方式，程序都会按预期打印 `[-3, -2, -1] [-3, -2, -1]`:
 
-```
+```java
 for (int i = 0; i < 3; i++) {
     set.remove(i);
     list.remove((Integer) i); // or remove(Integer.valueOf(i))
 }
 ```
 
-The confusing behavior demonstrated by the previous example came about because the List<E> interface has two overloadings of the remove method: remove(E) and remove(int). Prior to Java 5 when the List interface was “generified,” it had a remove(Object) method in place of remove(E), and the corresponding parameter types, Object and int, were radically different. But in the presence of generics and autoboxing, the two parameter types are no longer radically different. In other words, adding generics and autoboxing to the language damaged the List interface. Luckily, few if any other APIs in the Java libraries were similarly damaged, but this tale makes it clear that autoboxing and generics increased the importance of caution when overloading. The addition of lambdas and method references in Java 8 further increased the potential for confusion in overloading. For example, consider these two snippets:
+The confusing behavior demonstrated by the previous example came about because the `List<E>` interface has two overloadings of the remove method: remove(E) and remove(int). Prior to Java 5 when the List interface was “generified,” it had a remove(Object) method in place of remove(E), and the corresponding parameter types, Object and int, were radically different. But in the presence of generics and autoboxing, the two parameter types are no longer radically different. In other words, adding generics and autoboxing to the language damaged the List interface. Luckily, few if any other APIs in the Java libraries were similarly damaged, but this tale makes it clear that autoboxing and generics increased the importance of caution when overloading. The addition of lambdas and method references in Java 8 further increased the potential for confusion in overloading. For example, consider these two snippets:
 
-前一个示例所演示的令人困惑的行为是由于 List<E> 接口对 remove 方法有两个重载：`remove(E)` 和 `remove(int)`。在 Java 5 之前，当 List 接口被「泛化」时，它有一个 `remove(Object)` 方法代替 `remove(E)`，而相应的参数类型 Object 和 int 则完全不同。但是，在泛型和自动装箱的存在下，这两种参数类型不再完全不同。换句话说，在语言中添加泛型和自动装箱破坏了 List 接口。幸运的是，Java 库中的其他 API 几乎没有受到类似的破坏，但是这个故事清楚地表明，自动装箱和泛型出现后，在重载时就应更加谨慎。Java 8 中添加的 lambda 表达式和方法引用进一步增加了重载中混淆的可能性。例如，考虑以下两个片段：
+前一个示例所演示的令人困惑的行为是由于 `List<E>` 接口对 remove 方法有两个重载：`remove(E)` 和 `remove(int)`。在 Java 5 之前，当 List 接口被「泛化」时，它有一个 `remove(Object)` 方法代替 `remove(E)`，而相应的参数类型 Object 和 int 则完全不同。但是，在泛型和自动装箱的存在下，这两种参数类型不再完全不同。换句话说，在语言中添加泛型和自动装箱破坏了 List 接口。幸运的是，Java 库中的其他 API 几乎没有受到类似的破坏，但是这个故事清楚地表明，自动装箱和泛型出现后，在重载时就应更加谨慎。Java 8 中添加的 lambda 表达式和方法引用进一步增加了重载中混淆的可能性。例如，考虑以下两个片段：
 
-```
+```java
 new Thread(System.out::println).start();
 ExecutorService exec = Executors.newCachedThreadPool();
 exec.submit(System.out::println);
@@ -168,7 +168,7 @@ While the resulting overloading clearly violates the guidelines in this item, it
 
 虽然这样的重载明显违反了此项中的指导原则，但它不会造成任何危害，因为当在同一个对象引用上调用这两个重载方法时，它们做的是完全相同的事情。程序员可能不知道将调用哪个重载，但只要它们的行为相同，就没有什么不良后果。确保这种行为的标准方法是将更具体的重载转发给更一般的重载：
 
-```
+```java
 // Ensuring that 2 methods have identical behavior by forwarding
 public boolean contentEquals(StringBuffer sb) {
     return contentEquals((CharSequence) sb);
@@ -185,5 +185,6 @@ To summarize, just because you can overload methods doesn’t mean you should. I
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-8/Chapter-8-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 51: Design method signatures carefully（仔细设计方法签名）](/Chapter-8/Chapter-8-Item-51-Design-method-signatures-carefully.md)**
 - **Next Item（下一条目）：[Item 53: Use varargs judiciously（明智地使用可变参数）](/Chapter-8/Chapter-8-Item-53-Use-varargs-judiciously.md)**
