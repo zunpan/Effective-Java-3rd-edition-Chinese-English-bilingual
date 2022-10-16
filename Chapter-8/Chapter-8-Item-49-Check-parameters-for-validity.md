@@ -56,7 +56,7 @@ For an unexported method, you, as the package author, control the circumstances 
 
 对于未导出的方法，作为包的作者，你应该定制方法调用的环境，因此你可以并且应该确保只传递有效的参数值。因此，非公共方法可以使用断言检查它们的参数，如下所示：
 
-```
+```java
 // Private helper function for a recursive sort
 private static void sort(long a[], int offset, int length) {
     assert a != null;
@@ -96,4 +96,5 @@ To summarize, each time you write a method or constructor, you should think abou
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-8/Chapter-8-Introduction.md)**
+
 - **Next Item（下一条目）：[Item 50: Make defensive copies when needed（在需要时制作防御性副本）](/Chapter-8/Chapter-8-Item-50-Make-defensive-copies-when-needed.md)**
