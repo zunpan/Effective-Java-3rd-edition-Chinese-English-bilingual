@@ -38,7 +38,7 @@ A third technique that combines aspects of the first two is to adapt the Builder
 
 **双元素枚举类型优于 boolean 参数，** 除非布尔值的含义在方法名中明确。枚举使代码更容易读和写。此外，它们使以后添加更多选项变得更加容易。例如，你可能有一个 Thermometer 类型与静态工厂，采用枚举：
 
-```
+```java
 public enum TemperatureScale { FAHRENHEIT, CELSIUS }
 ```
 
@@ -48,5 +48,6 @@ Not only does Thermometer.newInstance(TemperatureScale.CELSIUS) make a lot more 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-8/Chapter-8-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 50: Make defensive copies when needed（在需要时制作防御性副本）](/Chapter-8/Chapter-8-Item-50-Make-defensive-copies-when-needed.md)**
 - **Next Item（下一条目）：[Item 52: Use overloading judiciously（明智地使用重载）](/Chapter-8/Chapter-8-Item-52-Use-overloading-judiciously.md)**
