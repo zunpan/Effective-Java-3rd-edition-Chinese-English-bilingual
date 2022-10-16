@@ -4,7 +4,7 @@
 
 One thing that makes Java a pleasure to use is that it is a safe language. This means that in the absence of native methods it is immune to buffer overruns, array overruns, wild pointers, and other memory corruption errors that plague unsafe languages such as C and C++. In a safe language, it is possible to write classes and to know with certainty that their invariants will hold, no matter what happens in any other part of the system. This is not possible in languages that treat all of memory as one giant array.
 
-Java 是一种安全的语言，这是它的一大优点。这意味着在没有本地方法的情况下，它不受缓冲区溢出、数组溢出、非法指针和其他内存损坏错误的影响，这些错误困扰着 C 和 c++ 等不安全语言。在一种安全的语言中，可以编写一个类并确定它们的不变量将保持不变，而不管在系统的任何其他部分发生了什么。在将所有内存视为一个巨大数组的语言中，这是不可能的。
+Java 是一种安全的语言，这是它的一大优点。这意味着在没有 native 方法的情况下，它不受缓冲区溢出、数组溢出、非法指针和其他内存损坏错误的影响，这些错误困扰着 C 和 C++ 等不安全语言。在一种安全的语言中，可以编写一个类并确定它们的不变量将保持不变，而不管在系统的任何其他部分发生了什么。在将所有内存视为一个巨大数组的语言中，这是不可能的。
 
 Even in a safe language, you aren’t insulated from other classes without some effort on your part. **You must program defensively, with the assumption that clients of your class will do their best to destroy its invariants.** This is increasingly true as people try harder to break the security of systems, but more commonly, your class will have to cope with unexpected behavior resulting from the honest mistakes of well-intentioned programmers. Either way, it is worth taking the time to write classes that are robust in the face of ill-behaved clients.
 
@@ -14,7 +14,7 @@ While it is impossible for another class to modify an object’s internal state 
 
 虽然如果没有对象的帮助，另一个类是不可能修改对象的内部状态的，但是要提供这样的帮助却出奇地容易。例如，考虑下面的类，它表示一个不可变的时间段：
 
-```
+```java
 // Broken "immutable" time period class
 public final class Period {
     private final Date start;
@@ -48,7 +48,7 @@ At first glance, this class may appear to be immutable and to enforce the invari
 
 乍一看，这个类似乎是不可变的，并且要求一个时间段的开始时间不能在结束时间之后。然而，利用 Date 是可变的这一事实很容易绕过这个约束：
 
-```
+```java
 // Attack the internals of a Period instance
 Date start = new Date();
 Date end = new Date();
@@ -64,7 +64,7 @@ To protect the internals of a Period instance from this sort of attack, **it is 
 
 为了保护 Period 实例的内部不受此类攻击，**必须将每个可变参数的防御性副本复制给构造函数**，并将副本用作 Period 实例的组件，而不是原始组件：
 
-```
+```java
 // Repaired constructor - makes defensive copies of parameters
 public Period(Date start, Date end) {
     this.start = new Date(start.getTime());
@@ -86,7 +86,7 @@ While the replacement constructor successfully defends against the previous atta
 
 虽然替换构造函数成功地防御了之前的攻击，但是仍然可以修改 Period 实例，因为它的访问器提供了对其可变内部结构的访问：
 
-```
+```java
 // Second attack on the internals of a Period instance
 Date start = new Date();
 Date end = new Date();
@@ -98,7 +98,7 @@ To defend against the second attack, merely modify the accessors to return defen
 
 要防御第二次攻击，只需修改访问器，返回可变内部字段的防御副本：
 
-```
+```java
 // Repaired accessors - make defensive copies of internal fields
 public Date start() {
     return new Date(start.getTime());
@@ -111,7 +111,7 @@ public Date end() {
 
 With the new constructor and the new accessors in place, Period is truly immutable. No matter how malicious or incompetent a programmer, there is simply no way to violate the invariant that the start of a period does not follow its end (without resorting to extralinguistic means such as native methods and reflection). This is true because there is no way for any class other than Period itself to gain access to either of the mutable fields in a Period instance. These fields are truly encapsulated within the object.
 
-有了新的构造函数和新的访问器，Period 实际上是不可变的。无论程序员多么恶毒或无能，都不可能违背一个时间段的开始时间不能在结束时间之后这一不变条件（除非使用诸如本地方法和反射之类的外部语言手段）。这是真的，因为除了 Period 本身之外，任何类都无法访问 Period 实例中的任何可变字段。这些字段真正封装在对象中。
+有了新的构造函数和新的访问器，Period 实际上是不可变的。无论程序员多么恶毒或无能，都不可能违背一个时间段的开始时间不能在结束时间之后这一不变条件（除非使用诸如 native 方法和反射之类的外部语言手段）。这是真的，因为除了 Period 本身之外，任何类都无法访问 Period 实例中的任何可变字段。这些字段真正封装在对象中。
 
 In the accessors, unlike the constructor, it would be permissible to use the clone method to make the defensive copies. This is so because we know that the class of Period’s internal Date objects is java.util.Date, and not some untrusted subclass. That said, you are generally better off using a constructor or static factory to copy an instance, for reasons outlined in Item 13.
 
@@ -147,5 +147,6 @@ In summary, if a class has mutable components that it gets from or returns to it
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-8/Chapter-8-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 49: Check parameters for validity（检查参数的有效性）](/Chapter-8/Chapter-8-Item-49-Check-parameters-for-validity.md)**
 - **Next Item（下一条目）：[Item 51: Design method signatures carefully（仔细设计方法签名）](/Chapter-8/Chapter-8-Item-51-Design-method-signatures-carefully.md)**
