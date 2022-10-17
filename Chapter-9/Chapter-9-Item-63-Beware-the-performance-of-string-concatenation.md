@@ -10,7 +10,7 @@ For example, consider this method, which constructs the string representation of
 
 例如，考虑这个方法，它通过将每个账单项目重复连接到一行来构造账单语句的字符串表示：
 
-```
+```java
 // Inappropriate use of string concatenation - Performs poorly!
 public String statement() {
     String result = "";
@@ -24,7 +24,7 @@ The method performs abysmally if the number of items is large. **To achieve acce
 
 如果项的数量很大，则该方法的性能非常糟糕。**要获得能接受的性能，请使用 StringBuilder 代替 String** 来存储正在构建的语句：
 
-```
+```java
 public String statement() {
     StringBuilder b = new StringBuilder(numItems() * LINE_WIDTH);
     for (int i = 0; i < numItems(); i++)
@@ -35,7 +35,7 @@ public String statement() {
 
 A lot of work has gone into making string concatenation faster since Java 6, but the difference in the performance of the two methods is still dramatic: If numItems returns 100 and lineForItem returns an 80-character string, the second method runs 6.5 times faster than the first on my machine. Because the first method is quadratic in the number of items and the second is linear, the performance difference gets much larger as the number of items grows. Note that the second method preallocates a StringBuilder large enough to hold the entire result, eliminating the need for automatic growth. Even if it is detuned to use a default-sized StringBuilder, it is still 5.5 times faster than the first method.
 
-自 Java 6 以来，为了使字符串连接更快，已经做了大量工作，但是这两个方法在性能上的差异仍然很大：如果 numItems 返回 100，lineForItem 返回 80 个字符串，那么第二个方法在我的机器上运行的速度是第一个方法的 6.5 倍。由于第一种方法在项目数量上是平方级的，而第二种方法是线性的，所以随着项目数量的增加，性能差异会变得越来越大。注意，第二个方法预先分配了一个足够大的 StringBuilder 来保存整个结果，从而消除了自动增长的需要。即使使用默认大小的 StringBuilder，它仍然比第一个方法快 5.5 倍。
+自 Java 6 以来，为了使字符串连接更快，已经做了大量工作，但是这两个方法在性能上的差异仍然很大：如果 numItems 返回 100，lineForItem 返回 80 个字符的字符串，那么第二个方法在我的机器上运行的速度是第一个方法的 6.5 倍。因为第一种方法在项的数量上是平方级的，而第二种方法是线性的，所以随着项的数量的增加，性能差异会变得越来越大。注意，第二个方法预先分配了一个足够大的 StringBuilder 来保存整个结果，从而消除了自动增长的需要。即使使用默认大小的 StringBuilder，它仍然比第一个方法快 5.5 倍。
 
 The moral is simple: **Don’t use the string concatenation operator to combine more than a few strings** unless performance is irrelevant. Use StringBuilder’s append method instead. Alternatively, use a character array, or process the strings one at a time instead of combining them.
 
@@ -43,5 +43,6 @@ The moral is simple: **Don’t use the string concatenation operator to combine 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-9/Chapter-9-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 62: Avoid strings where other types are more appropriate（其他类型更合适时应避免使用字符串）](/Chapter-9/Chapter-9-Item-62-Avoid-strings-where-other-types-are-more-appropriate.md)**
 - **Next Item（下一条目）：[Item 64: Refer to objects by their interfaces（通过接口引用对象）](/Chapter-9/Chapter-9-Item-64-Refer-to-objects-by-their-interfaces.md)**
