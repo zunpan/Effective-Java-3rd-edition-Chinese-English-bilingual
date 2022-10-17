@@ -12,13 +12,13 @@ As mentioned in Item 6, autoboxing and auto-unboxing blur but do not erase the d
 
 There are three major differences between primitives and boxed primitives. First, primitives have only their values, whereas boxed primitives have identities distinct from their values. In other words, two boxed primitive instances can have the same value and different identities. Second, primitive types have only fully functional values, whereas each boxed primitive type has one nonfunctional value, which is null, in addition to all the functional values of the corresponding primitive type. Last, primitives are more time- and spaceefficient than boxed primitives. All three of these differences can get you into real trouble if you aren’t careful.
 
-基本类型和包装类型之间有三个主要区别。首先，基本类型只有它们的值，而包装类型具有与其值不同的标识。换句话说，两个包装类型实例可以具有相同的值和不同的标识。第二，基本类型只有全功能值，而每个包装类型除了对应的基本类型的所有功能值外，还有一个非功能值，即 null。最后，基本类型比包装类型更节省时间和空间。如果你不小心的话，这三种差异都会给你带来真正的麻烦。
+基本类型和包装类型之间有三个主要区别。首先，基本类型只有它们的值，而包装类型具有与其值不同的标识。换句话说，两个包装类型实例可以具有相同的值和不同的标识。第二，基本类型只有全部功能值，而每个包装类型除了对应的基本类型的所有功能值外，还有一个非功能值，即 null。最后，基本类型比包装类型更节省时间和空间。如果你不小心的话，这三种差异都会给你带来真正的麻烦。
 
 Consider the following comparator, which is designed to represent ascending numerical order on Integer values. (Recall that a comparator’s compare method returns a number that is negative, zero, or positive, depending on whether its first argument is less than, equal to, or greater than its second.) You wouldn’t need to write this comparator in practice because it implements the natural ordering on Integer, but it makes for an interesting example:
 
 考虑下面的比较器，它的设计目的是表示 Integer 值上的升序数字排序。（回想一下，比较器的 compare 方法返回一个负数、零或正数，这取决于它的第一个参数是小于、等于还是大于第二个参数。）你不需要在实际使用中编写这个比较器，因为它实现了 Integer 的自然排序，但它提供了一个有趣的例子：
 
-```
+```java
 // Broken comparator - can you spot the flaw?
 Comparator<Integer> naturalOrder =(i, j) -> (i < j) ? -1 : (i == j ? 0 : 1);
 ```
@@ -35,7 +35,7 @@ In practice, if you need a comparator to describe a type’s natural order, you 
 
 在实际使用中，如果你需要一个比较器来描述类型的自然顺序，你应该简单地调用 `Comparator.naturalOrder()`，如果你自己编写一个比较器，你应该使用比较器构造方法，或者对基本类型使用静态比较方法（[Item-14](/Chapter-3/Chapter-3-Item-14-Consider-implementing-Comparable.md)）。也就是说，你可以通过添加两个局部变量来存储基本类型 int 值，并对这些变量执行所有的比较，从而修复损坏的比较器中的问题。这避免了错误的标识比较：
 
-```
+```java
 Comparator<Integer> naturalOrder = (iBoxed, jBoxed) -> {
     int i = iBoxed, j = jBoxed; // Auto-unboxing
     return i < j ? -1 : (i == j ? 0 : 1);
@@ -46,25 +46,25 @@ Next, consider this delightful little program:
 
 接下来，考虑一下这个有趣的小程序：
 
-```
+```java
 public class Unbelievable {
-static Integer i;
-public static void main(String[] args) {
-    if (i == 42)
-        System.out.println("Unbelievable");
+    static Integer i;
+    public static void main(String[] args) {
+        if (i == 42)
+            System.out.println("Unbelievable");
+        }
     }
-}
 ```
 
-No, it doesn’t print Unbelievable—but what it does is almost as strange. It throws a NullPointerException when evaluating the expression i==42. The problem is that i is an Integer, not an int, and like all nonconstant object reference fields, its initial value is null. When the program evaluates the expression i==42, it is comparing an Integer to an int. In nearly every case **when you mix primitives and boxed primitives in an operation, the boxed primitive is auto-unboxed.** If a null object reference is auto-unboxed, you get a NullPointerException. As this program demonstrates, it can happen almost anywhere. Fixing the problem is as simple as declaring i to be an int instead of an Integer.
+No, it doesn’t print Unbelievable—but what it does is almost as strange. It throws a NullPointerException when evaluating the expression i==42. The problem is that i is an Integer, not an int, and like all nonconstant object reference fields, its initial value is null. When the program evaluates the expression i == 42, it is comparing an Integer to an int. In nearly every case **when you mix primitives and boxed primitives in an operation, the boxed primitive is auto-unboxed.** If a null object reference is auto-unboxed, you get a NullPointerException. As this program demonstrates, it can happen almost anywhere. Fixing the problem is as simple as declaring i to be an int instead of an Integer.
 
-不，它不会打印出令人难以置信的东西，但它的行为很奇怪。它在计算表达式 `i==42` 时抛出 NullPointerException。问题是，i 是 Integer，而不是 int 数，而且像所有非常量对象引用字段一样，它的初值为 null。当程序计算表达式 `i==42` 时，它是在比较 Integer 与 int。**在操作中混合使用基本类型和包装类型时，包装类型就会自动拆箱**，这种情况无一例外。如果一个空对象引用自动拆箱，那么你将得到一个 NullPointerException。正如这个程序所演示的，它几乎可以在任何地方发生。修复这个问题非常简单，只需将 i 声明为 int 而不是 Integer。
+不，它不会打印出“Unbelievable”，但它的行为很奇怪。它在计算表达式 `i==42` 时抛出 NullPointerException。问题是，i 是 Integer，而不是 int 数，而且像所有非常量对象引用字段一样，它的初值为 null。当程序计算表达式 `i==42` 时，它是在比较 Integer 与 int。**在操作中混合使用基本类型和包装类型时，包装类型就会自动拆箱**，这种情况无一例外。如果一个空对象引用自动拆箱，那么你将得到一个 NullPointerException。正如这个程序所演示的，它几乎可以在任何地方发生。修复这个问题非常简单，只需将 i 声明为 int 而不是 Integer。
 
 Finally, consider the program from page 24 in Item 6:
 
 最后，考虑 [Item-6](/Chapter-2/Chapter-2-Item-6-Avoid-creating-unnecessary-objects.md) 中第 24 页的程序：
 
-```
+```java
 // Hideously slow program! Can you spot the object creation?
 public static void main(String[] args) {
     Long sum = 0L;
@@ -93,5 +93,6 @@ In summary, use primitives in preference to boxed primitives whenever you have t
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-9/Chapter-9-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 60: Avoid float and double if exact answers are required（若需要精确答案就应避免使用 float 和 double 类型）](/Chapter-9/Chapter-9-Item-60-Avoid-float-and-double-if-exact-answers-are-required.md)**
 - **Next Item（下一条目）：[Item 62: Avoid strings where other types are more appropriate（其他类型更合适时应避免使用字符串）](/Chapter-9/Chapter-9-Item-62-Avoid-strings-where-other-types-are-more-appropriate.md)**
