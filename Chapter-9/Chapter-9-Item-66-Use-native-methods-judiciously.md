@@ -8,7 +8,7 @@ Java 本地接口（JNI）允许 Java 程序调用本地方法，这些方法是
 
 It is legitimate to use native methods to access platform-specific facilities, but it is seldom necessary: as the Java platform matured, it provided access to many features previously found only in host platforms. For example, the process API, added in Java 9, provides access to OS processes. It is also legitimate to use native methods to use native libraries when no equivalent libraries are available in Java.
 
-使用本地方法访问特定于平台的机制是合法的，但是很少有必要：随着 Java 平台的成熟，它提供了对许多以前只能在宿主平台中上找到的特性。例如，Java 9 中添加的流 API 提供了对 OS 流程的访问。在 Java 中没有等效库时，使用本地方法来使用本地库也是合法的。
+使用本地方法访问特定于平台的机制是合法的，但是很少有必要：随着 Java 平台的成熟，它提供了对许多以前只能在宿主平台中上找到的特性。例如，Java 9 中添加的流 API 提供了对 OS 进程的访问。在 Java 中没有等效库时，使用本地方法来使用本地库也是合法的。
 
 **It is rarely advisable to use native methods for improved performance.** In early releases (prior to Java 3), it was often necessary, but JVMs have gotten much faster since then. For most tasks, it is now possible to obtain comparable performance in Java. For example, when java.math was added in release 1.1, BigInteger relied on a then-fast multiprecision arithmetic library written in C. In Java 3, BigInteger was reimplemented in Java, and carefully tuned to the point where it ran faster than the original native implementation.
 
@@ -28,5 +28,6 @@ In summary, think twice before using native methods. It is rare that you need to
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-9/Chapter-9-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 65: Prefer interfaces to reflection（接口优于反射）](/Chapter-9/Chapter-9-Item-65-Prefer-interfaces-to-reflection.md)**
 - **Next Item（下一条目）：[Item 67: Optimize judiciously（明智地进行优化）](/Chapter-9/Chapter-9-Item-67-Optimize-judiciously.md)**
