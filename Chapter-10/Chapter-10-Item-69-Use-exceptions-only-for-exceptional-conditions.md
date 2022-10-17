@@ -6,7 +6,7 @@ Someday, if you are unlucky, you may stumble across a piece of code that looks s
 
 你可能会偶然发现这样一段代码：
 
-```
+```java
 // Horrible abuse of exceptions. Don't ever do this!
 try {
     int i = 0;
@@ -21,14 +21,14 @@ What does this code do? It’s not at all obvious from inspection, and that’s 
 
 这段代码是做什么的？从表面上看，一点也不明显，这足以成为不使用它的充分理由（[Item-67](/Chapter-9/Chapter-9-Item-67-Optimize-judiciously.md)）。事实证明，这是一个用于遍历数组的元素的非常糟糕的习惯用法。当试图访问数组边界之外的数组元素时，通过抛出、捕获和忽略 ArrayIndexOutOfBoundsException 来终止无限循环。如下循环遍历数组的标准习惯用法，任何 Java 程序员都可以立即识别它：
 
-```
+```java
 for (Mountain m : range)
     m.climb();
 ```
 
 So why would anyone use the exception-based loop in preference to the tried and true? It’s a misguided attempt to improve performance based on the faulty reasoning that, since the VM checks the bounds of all array accesses, the normal loop termination test—hidden by the compiler but still present in the for-each loop—is redundant and should be avoided. There are three things wrong with this reasoning:
 
-那么，为什么会有人使用基于异常的循环而不使用习惯的循环模式呢？由于 VM 检查所有数组访问的边界，所以误认为正常的循环终止测试被编译器隐藏了，但在 for-each 循环中仍然可见，这无疑是多余的，应该避免，因此利用错误判断机制来提高性能是错误的。这种思路有三点误区：
+那么，为什么会有人使用基于异常的循环而不使用习惯的循环模式呢？由于VM会检查所有数组访问的边界，正常的循环终止测试被编译器隐藏了，但在for-each循环中仍然存在，因此应该避免这种错误的推理，这是一种误导性的提高性能的尝试。这种思路有三点误区：
 
 - Because exceptions are designed for exceptional circumstances, there is little incentive for JVM implementors to make them as fast as explicit tests.
 
@@ -58,7 +58,7 @@ This principle also has implications for API design. **A well-designed API must 
 
 这个原则对 API 设计也有影响。一个设计良好的 API 不能迫使其客户端为一般的控制流程使用异常。只有在某些不可预知的条件下才能调用具有「状态依赖」方法的类，通常应该有一个单独的「状态测试」方法，表明是否适合调用「状态依赖」方法。例如，Iterator 接口具有「状态依赖」的 next 方法和对应的「状态测试」方法 hasNext。这使得传统 for 循环（在 for-each 循环内部也使用了 hasNext 方法）在集合上进行迭代成为标准习惯用法：
 
-```
+```java
 for (Iterator<Foo> i = collection.iterator(); i.hasNext(); ) {
     Foo foo = i.next();
     ...
@@ -69,7 +69,7 @@ If Iterator lacked the hasNext method, clients would be forced to do this instea
 
 如果 Iterator 缺少 hasNext 方法，客户端将被迫这样做：
 
-```
+```java
 // Do not use this hideous code for iteration over a collection!
 try {
     Iterator<Foo> i = collection.iterator();
@@ -100,4 +100,5 @@ In summary, exceptions are designed for exceptional conditions. Don’t use them
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Next Item（下一条目）：[Item 70: Use checked exceptions for recoverable conditions and runtime exceptions for programming errors（对可恢复情况使用 checked 异常，对编程错误使用运行时异常）](/Chapter-10/Chapter-10-Item-70-Use-checked-exceptions-for-recoverable-conditions-and-runtime-exceptions-for-programming-errors.md)**
