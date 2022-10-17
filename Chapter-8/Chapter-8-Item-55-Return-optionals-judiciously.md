@@ -18,7 +18,7 @@ In Item 30, we showed this method to calculate the maximum value in a collection
 
 在 [Item-30](/Chapter-5/Chapter-5-Item-30-Favor-generic-methods.md) 中，我们展示了根据集合元素的自然顺序计算集合最大值的方法。
 
-```
+```java
 // Returns maximum value in collection - throws exception if empty
 public static <E extends Comparable<E>> E max(Collection<E> c) {
     if (c.isEmpty())
@@ -26,7 +26,7 @@ public static <E extends Comparable<E>> E max(Collection<E> c) {
     E result = null;
     for (E e : c)
         if (result == null || e.compareTo(result) > 0)
-    result = Objects.requireNonNull(e);
+            result = Objects.requireNonNull(e);
     return result;
 }
 ```
@@ -35,7 +35,7 @@ This method throws an IllegalArgumentException if the given collection is empty.
 
 如果给定集合为空，此方法将抛出 IllegalArgumentException。我们在 [Item-30](/Chapter-5/Chapter-5-Item-30-Favor-generic-methods.md) 中提到，更好的替代方法是返回 `Optional<E>`。
 
-```
+```java
 // Returns maximum value in collection as an Optional<E>
 public static <E extends Comparable<E>> Optional<E> max(Collection<E> c) {
     if (c.isEmpty())
@@ -43,20 +43,20 @@ public static <E extends Comparable<E>> Optional<E> max(Collection<E> c) {
     E result = null;
     for (E e : c)
         if (result == null || e.compareTo(result) > 0)
-    result = Objects.requireNonNull(e);
+            result = Objects.requireNonNull(e);
     return Optional.of(result);
 }
 ```
 
 As you can see, it is straightforward to return an optional. All you have to do is to create the optional with the appropriate static factory. In this program, we use two: Optional.empty() returns an empty optional, and Optional.of(value) returns an optional containing the given non-null value. It is a programming error to pass null to Optional.of(value). If you do this, the method responds by throwing a NullPointerException. The Optional.ofNullable(value) method accepts a possibly null value and returns an empty optional if null is passed in. **Never return a null value from an Optional-returning method:** it defeats the entire purpose of the facility.
 
-如你所见，返回一个 Optional 是很简单的。你所要做的就是使用适当的静态工厂创建。在这个程序中，我们使用了两个静态工厂：`Optional.empty()` 返回一个空的 Optional，`Optional.of(value)` 返回一个包含给定非空值的可选值。将 null 传递给 `Optional.of(value)` 是一个编程错误。如果你这样做，该方法将通过抛出 NullPointerException 来响应。`Optional.ofNullable(value)` 方法接受一个可能为空的值，如果传入 null，则返回一个空的 Optional。**永远不要从具备 Optional 返回值的方法返回空值:** 它违背了这个功能的设计初衷。
+如你所见，返回一个 Optional 是很简单的。你所要做的就是使用适当的静态工厂创建。在这个程序中，我们使用了两个静态工厂：`Optional.empty()` 返回一个空的 Optional，`Optional.of(value)` 返回一个包含给定非空值的可选值。将 null 传递给 `Optional.of(value)` 是一个编程错误。如果你这样做，该方法将通过抛出 NullPointerException 来响应。`Optional.ofNullable(value)` 方法接受一个可能为空的值，如果传入 null，则返回一个空的 Optional。**永远不要让返回 optional 的方法返回 null :** 它违背了这个功能的设计初衷。
 
 Many terminal operations on streams return optionals. If we rewrite the max method to use a stream, Stream’s max operation does the work of generating an optional for us (though we do have to pass in an explicit comparator):
 
-许多流上的 Terminal 操作返回 Optional。如果我们使用一个流来重写 max 方法，那么流版本的 max 操作会为我们生成一个 Optional（尽管我们必须传递一个显式的 comparator）：
+许多流上的中间操作返回 Optional。如果我们使用一个流来重写 max 方法，那么流版本的 max 操作会为我们生成一个 Optional（尽管我们必须传递一个显式的 comparator）：
 
-```
+```java
 // Returns max val in collection as Optional<E> - uses stream
 public static <E extends Comparable<E>> Optional<E> max(Collection<E> c) {
     return c.stream().max(Comparator.naturalOrder());
@@ -65,13 +65,13 @@ public static <E extends Comparable<E>> Optional<E> max(Collection<E> c) {
 
 So how do you choose to return an optional instead of returning a null or throwing an exception? Optionals are similar in spirit to checked exceptions (Item 71), in that they force the user of an API to confront the fact that there may be no value returned. Throwing an unchecked exception or returning a null allows the user to ignore this eventuality, with potentially dire consequences. However, throwing a checked exception requires additional boilerplate code in the client.
 
-那么，如何选择是返回 Optional 而不是返回 null 或抛出异常呢？Optional 在本质上类似于已检查异常（[Item-71](/Chapter-10/Chapter-10-Item-71-Avoid-unnecessary-use-of-checked-exceptions.md)），因为它们迫使 API 的用户面对可能没有返回值的事实。抛出未检查的异常或返回 null 允许用户忽略这种可能性，从而带来潜在的可怕后果。但是，抛出一个已检查的异常需要在客户端中添加额外的样板代码。
+那么，如何选择是返回 Optional 而不是返回 null 或抛出异常呢？Optional 在本质上类似于受检查异常（[Item-71](/Chapter-10/Chapter-10-Item-71-Avoid-unnecessary-use-of-checked-exceptions.md)），因为它们迫使 API 的用户面对可能没有返回值的事实。抛出不受检查的异常或返回 null 允许用户忽略这种可能性，从而带来潜在的可怕后果。但是，抛出一个受检查的异常需要在客户端中添加额外的样板代码。
 
 If a method returns an optional, the client gets to choose what action to take if the method can’t return a value. You can specify a default value:
 
 如果一个方法返回一个 Optional，客户端可以选择如果该方法不能返回值该采取什么操作。你可以指定一个默认值：
 
-```
+```java
 // Using an optional to provide a chosen default value
 String lastWordInLexicon = max(words).orElse("No words...");
 ```
@@ -80,16 +80,16 @@ or you can throw any exception that is appropriate. Note that we pass in an exce
 
 或者你可以抛出任何适当的异常。注意，我们传递的是异常工厂，而不是实际的异常。这避免了创建异常的开销，除非它实际被抛出：
 
-```
+```java
 // Using an optional to throw a chosen exception
 Toy myToy = max(toys).orElseThrow(TemperTantrumException::new);
 ```
 
 If you can prove that an optional is nonempty, you can get the value from the optional without specifying an action to take if the optional is empty, but if you’re wrong, your code will throw a NoSuchElementException:
 
-如果你能证明一个 Optional 非空，你可以从 Optional 获取值，而不需要指定一个操作来执行，如果 Optional 是空的，但是如果你错了，你的代码会抛出一个 NoSuchElementException：
+如果你能证明一个 Optional 非空，你可以从 Optional 获取值，而不需要指定一个当 Optional 是空时的操作，但是如果你错了，你的代码会抛出一个 NoSuchElementException：
 
-```
+```java
 // Using optional when you know there’s a return value
 Element lastNobleGas = max(Elements.NOBLE_GASES).get();
 ```
@@ -106,7 +106,7 @@ For example, consider this code snippet, which prints the process ID of the pare
 
 例如，考虑这段代码，它打印一个进程的父进程的 ID，如果进程没有父进程，则打印 N/A。该代码段使用了在 Java 9 中引入的 ProcessHandle 类：
 
-```
+```java
 Optional<ProcessHandle> parentProcess = ph.parent();
 System.out.println("Parent PID: " + (parentProcess.isPresent() ?
 String.valueOf(parentProcess.get().pid()) : "N/A"));
@@ -116,7 +116,7 @@ The code snippet above can be replaced by this one, which uses Optional’s map 
 
 上面的代码片段可以替换为如下形式，它使用了 Optional 的 map 函数：
 
-```
+```java
 System.out.println("Parent PID: " + ph.parent().map(h -> String.valueOf(h.pid())).orElse("N/A"));
 ```
 
@@ -124,7 +124,7 @@ When programming with streams, it is not uncommon to find yourself with a `Strea
 
 当使用流进行编程时，通常会发现你经常使用 `Stream<Optional<T>>`，并且需要一个 `Stream<T>`，其中包含非空 Optional 中的所有元素，以便继续。如果你正在使用 Java 8，下面的语句演示了如何弥补这个不足：
 
-```
+```java
 streamOfOptionals.filter(Optional::isPresent).map(Optional::get)
 ```
 
@@ -132,13 +132,13 @@ In Java 9, Optional was outfitted with a stream() method. This method is an adap
 
 在 Java 9 中，Optional 配备了一个 `stream()` 方法。这个方法是一个适配器，它将一个 Optional 元素转换成一个包含元素的流（如果一个元素出现在 Optional 元素中），如果一个元素是空的，则一个元素都没有。与 Stream 的 flatMap 方法（[Item-45](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md)）相结合，这个方法为上面的代码段提供了一个简洁的替换版本：
 
-```
-streamOfOptionals..flatMap(Optional::stream)
+```java
+streamOfOptionals.flatMap(Optional::stream)
 ```
 
 Not all return types benefit from the optional treatment. **Container types, including collections, maps, streams, arrays, and optionals should not be wrapped in optionals.** Rather than returning an empty `Optional<List<T>>`, you should simply return an empty `List<T>` (Item 54). Returning the empty container will eliminate the need for client code to process an optional. The ProcessHandle class does have the arguments method, which returns `Optional<String[]>`, but this method should be regarded as an anomaly that is not to be emulated.
 
-并不是所有的返回类型都能从 Optional 处理中获益。**容器类型，包括集合、Map、流、数组和 Optional，不应该封装在 Optional 中。** 你应该简单的返回一个空的 `List<T>`，而不是一个空的 `Optional<List<T>>`（[Item-54](/Chapter-8/Chapter-8-Item-54-Return-empty-collections-or-arrays-not-nulls.md)）。返回空容器将消除客户端代码处理 Optional 容器的需要。ProcessHandle 类确实有 arguments 方法，它返回 `Optional<String[]>`，但是这个方法应该被视为一种特例，不应该被仿效。
+并不是所有的返回类型都能从 Optional 处理中获益。**容器类型，包括集合、Map、流、数组和 Optional，不应该封装在 Optional 中。** 你应该简单的返回一个空的 `List<T>`，而不是一个空的 `Optional<List<T>>`（[Item-54](/Chapter-8/Chapter-8-Item-54-Return-empty-collections-or-arrays-not-nulls.md)）。返回空容器将消除客户端代码处理 Optional 容器的需要。ProcessHandle 类确实有返回参数的方法，它返回 `Optional<String[]>`，但是这个方法应该被视为一种特例，不应该被仿效。
 
 So when should you declare a method to return `Optional<T>` rather than T? As a rule, **you should declare a method to return `Optional<T>` if it might not be able to return a result and clients will have to perform special processing if no result is returned.** That said, returning an `Optional<T>` is not without cost. An Optional is an object that has to be allocated and initialized, and reading the value out of the optional requires an extra indirection. This makes optionals inappropriate for use in some performance-critical situations. Whether a particular method falls into this category can only be determined by careful measurement (Item 67).
 
@@ -146,11 +146,11 @@ So when should you declare a method to return `Optional<T>` rather than T? As a 
 
 Returning an optional that contains a boxed primitive type is prohibitively expensive compared to returning a primitive type because the optional has two levels of boxing instead of zero. Therefore, the library designers saw fit to provide analogues of `Optional<T>` for the primitive types int, long, and double. These optional types are OptionalInt, OptionalLong, and OptionalDouble. They contain most, but not all, of the methods on `Optional<T>`. Therefore, **you should never return an optional of a boxed primitive type,** with the possible exception of the “minor primitive types,” Boolean, Byte, Character, Short, and Float.
 
-与返回基本数据类型相比，返回包含包装类的 Optional 类型的代价高得惊人，因为 Optional 类型有两个装箱级别，而不是零。因此，库设计人员认为应该为基本类型 int、long 和 double 提供类似的 `Optional<T>`。这些可选类型是 OptionalInt、OptionalLong 和 OptionalDouble。它们包含 `Optional<T>` 上的大多数方法，但不是所有方法。因此，**永远不应该返包装类的 Optional**，可能除了「次基本数据类型」，如 Boolean、Byte、Character、Short 和 Float 之外。
+与返回基本数据类型相比，返回包含包装类的 Optional 类型的代价高得惊人，因为 Optional 类型有两个装箱级别，而不是零。因此，库设计人员认为应该为基本类型 int、long 和 double 提供类似的 `Optional<T>`。这些可选类型是 OptionalInt、OptionalLong 和 OptionalDouble。它们包含 `Optional<T>` 上的大多数方法，但不是所有方法。因此，**永远不应该返回包装类的 Optional**，可能除了「次基本数据类型」，如 Boolean、Byte、Character、Short 和 Float 之外。
 
 Thus far, we have discussed returning optionals and processing them after they are returned. We have not discussed other possible uses, and that is because most other uses of optionals are suspect. For example, you should never use optionals as map values. If you do, you have two ways of expressing a key’s logical absence from the map: either the key can be absent from the map, or it can be present and map to an empty optional. This represents needless complexity with great potential for confusion and errors. More generally, **it is almost never appropriate to use an optional as a key, value, or element in a collection or array.**
 
-到目前为止，我们已经讨论了返回 Optional 并在返回后如何处理它们。我们还没有讨论其他可能的用法，这是因为大多数其他 Optional 用法都是值得疑的。例如，永远不要将 Optional 用作 Map 的值。如果这样做，则有两种方法可以表示键在 Map 中逻辑上的缺失：键可以不在 Map 中，也可以存在并映射到空的 Optional。这代表了不必要的复杂性，很有可能导致混淆和错误。更一般地说，**在集合或数组中使用 Optional 作为键、值或元素几乎都是不合适的。**
+到目前为止，我们已经讨论了返回 Optional 并在返回后如何处理它们。我们还没有讨论其他可能的用法，这是因为大多数其他 Optional 用法都是值得怀疑的。例如，永远不要将 Optional 用作 Map 的值。如果这样做，则有两种方法可以表示键在 Map 中逻辑上的缺失：键可以不在 Map 中，也可以存在并映射到空的 Optional。这代表了不必要的复杂性，很有可能导致混淆和错误。更一般地说，**在集合或数组中使用 Optional 作为键、值或元素几乎都是不合适的。**
 
 This leaves a big question unanswered. Is it ever appropriate to store an optional in an instance field? Often it’s a “bad smell”: it suggests that perhaps you should have a subclass containing the optional fields. But sometimes it may be justified. Consider the case of our NutritionFacts class in Item 2. A NutritionFacts instance contains many fields that are not required. You can’t have a subclass for every possible combination of these fields. Also, the fields have primitive types, which make it awkward to express absence directly. The best API for NutritionFacts would return an optional from the getter for each optional field, so it makes good sense to simply store those optionals as fields in the object.
 
@@ -162,5 +162,6 @@ In summary, if you find yourself writing a method that can’t always return a v
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-8/Chapter-8-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 54: Return empty collections or arrays, not nulls（返回空集合或数组，而不是 null）](/Chapter-8/Chapter-8-Item-54-Return-empty-collections-or-arrays-not-nulls.md)**
 - **Next Item（下一条目）：[Item 56: Write doc comments for all exposed API elements（为所有公开的 API 元素编写文档注释）](/Chapter-8/Chapter-8-Item-56-Write-doc-comments-for-all-exposed-API-elements.md)**
