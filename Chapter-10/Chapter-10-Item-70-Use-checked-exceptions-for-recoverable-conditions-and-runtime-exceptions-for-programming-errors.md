@@ -12,8 +12,7 @@ The cardinal rule in deciding whether to use a checked or an unchecked exception
 
 By confronting the user with a checked exception, the API designer presents a mandate to recover from the condition. The user can disregard the mandate by catching the exception and ignoring it, but this is usually a bad idea (Item 77).
 
-通过向用户提供 checked 异常，API 设计者提供了从条件中恢复的要求。用户为了无视强制要求，可以捕获异常并忽略，但这通常不是一个好主意（[Item-77](/Chapter-10/Chapter-10-Item-77-Don’t-ignore-exceptions.md)）
-。
+通过向用户提供 checked 异常，API 设计者提供了从异常情况中恢复的要求。用户为了无视强制要求，可以捕获异常并忽略，但这通常不是一个好主意（[Item-77](/Chapter-10/Chapter-10-Item-77-Don’t-ignore-exceptions.md)）
 
 There are two kinds of unchecked throwables: runtime exceptions and errors. They are identical in their behavior: both are throwables that needn’t, and generally shouldn’t, be caught. If a program throws an unchecked exception or an error, it is generally the case that recovery is impossible and continued execution would do more harm than good. If a program does not catch such a throwable, it will cause the current thread to halt with an appropriate error message.
 
@@ -49,5 +48,6 @@ To summarize, throw checked exceptions for recoverable conditions and unchecked 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 69: Use exceptions only for exceptional conditions（仅在确有异常条件下使用异常）](/Chapter-10/Chapter-10-Item-69-Use-exceptions-only-for-exceptional-conditions.md)**
 - **Next Item（下一条目）：[Item 71: Avoid unnecessary use of checked exceptions（避免不必要地使用 checked 异常）](/Chapter-10/Chapter-10-Item-71-Avoid-unnecessary-use-of-checked-exceptions.md)**
