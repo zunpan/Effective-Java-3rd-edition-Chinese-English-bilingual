@@ -22,7 +22,7 @@ The detail message of an exception should not be confused with a user-level erro
 
 异常的详细信息不应该与用户层的错误消息混淆，因为用户层错误消息最终必须被用户理解。与用户层错误消息不同，详细消息主要是为程序员或管理员在分析故障时提供的。因此，信息内容远比可读性重要。用户层错误消息通常是本地化的，而异常详细信息消息很少本地化。确保异常在其详细信息中包含足够的故障捕获信息的一种方法是，在其构造函数中配置，而不是以传入字符串方式引入这些信息。之后可以自动生成详细信息来包含细节。例如，IndexOutOfBoundsException 构造函数不包含 String 参数，而是像这样：
 
-```
+```java
 /**
 * Constructs an IndexOutOfBoundsException.
 **
@@ -46,7 +46,7 @@ As of Java 9, IndexOutOfBoundsException finally acquired a constructor that take
 
 **译注：IndexOutOfBoundsException 有关 int 参数的构造函数源码**
 
-```
+```java
 /**
      * Constructs a new {@code IndexOutOfBoundsException} class with an
      * argument indicating the illegal index.
@@ -64,9 +64,10 @@ As of Java 9, IndexOutOfBoundsException finally acquired a constructor that take
 
 As suggested in Item 70, it may be appropriate for an exception to provide accessor methods for its failure-capture information (lowerBound, upperBound, and index in the above example). It is more important to provide such accessor methods on checked exceptions than unchecked, because the failure-capture information could be useful in recovering from the failure. It is rare (although not inconceivable) that a programmer might want programmatic access to the details of an unchecked exception. Even for unchecked exceptions, however, it seems advisable to provide these accessors on general principle (Item 12, page 57).
 
-正如 [Item-70](/Chapter-10/Chapter-10-Item-70-Use-checked-exceptions-for-recoverable-conditions-and-runtime-exceptions-for-programming-errors.md) 中建议的，异常为其故障捕获信息提供访问器方法是适合的（上面示例中的下界、上界和索引）。在 checked 异常上提供此类访问器方法比 unchecked 异常上提供此类访问器方法更为重要，因为故障捕获信息可能有助于程序从故障中恢复。程序员可能希望通过编程访问 unchecked 异常的详细信息，但这是很少见的（尽管是可以想象的）。然而，即使对于 unchecked 异常，根据一般原则，提供这些访问器也是可以的（[Item-12](/Chapter-3/Chapter-3-Item-12-Always-override-toString.md)，第 57 页）。
+正如 [Item-70](/Chapter-10/Chapter-10-Item-70-Use-checked-exceptions-for-recoverable-conditions-and-runtime-exceptions-for-programming-errors.md) 中建议的，为异常提供故障捕获信息访问器方法是适合的（上面示例中的下界、上界和索引）。在 checked 异常上提供此类访问器方法比 unchecked 异常上提供此类访问器方法更为重要，因为故障捕获信息可能有助于程序从故障中恢复。程序员可能希望通过编程访问 unchecked 异常的详细信息，但这是很少见的（尽管是可以想象的）。然而，即使对于 unchecked 异常，根据一般原则，提供这些访问器也是可以的（[Item-12](/Chapter-3/Chapter-3-Item-12-Always-override-toString.md)，第 57 页）。
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 74: Document all exceptions thrown by each method（为每个方法记录会抛出的所有异常）](/Chapter-10/Chapter-10-Item-74-Document-all-exceptions-thrown-by-each-method.md)**
 - **Next Item（下一条目）：[Item 76: Strive for failure atomicity（尽力保证故障原子性）](/Chapter-10/Chapter-10-Item-76-Strive-for-failure-atomicity.md)**
