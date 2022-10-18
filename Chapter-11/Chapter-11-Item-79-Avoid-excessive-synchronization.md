@@ -8,13 +8,13 @@ Item 78 warns of the dangers of insufficient synchronization. This item concerns
 
 **To avoid liveness and safety failures, never cede control to the client within a synchronized method or block.** In other words, inside a synchronized region, do not invoke a method that is designed to be overridden, or one provided by a client in the form of a function object (Item 24). From the perspective of the class with the synchronized region, such methods are alien. The class has no knowledge of what the method does and has no control over it. Depending on what an alien method does, calling it from a synchronized region can cause exceptions, deadlocks, or data corruption.
 
-**为避免活性失败和安全故障，永远不要在同步方法或块中将控制权交给客户端。** 换句话说，在同步区域内，不要调用一个设计为被覆盖的方法，或者一个由客户端以函数对象的形式提供的方法（[Item-24](/Chapter-4/Chapter-4-Item-24-Favor-static-member-classes-over-nonstatic.md)）。从具有同步区域的类的角度来看，这种方法是不一样的。类不知道该方法做什么，也无法控制它。Depending on what an alien method does，从同步区域调用它可能会导致异常、死锁或数据损坏。
+**为避免活性失败和安全故障，永远不要在同步方法或块中将控制权交给客户端。** 换句话说，在同步区域内，不要调用一个设计为被重写的方法，或者一个由客户端以函数对象的形式提供的方法（[Item-24](/Chapter-4/Chapter-4-Item-24-Favor-static-member-classes-over-nonstatic.md)）。从具有同步区域的类的角度来看，这种方法是不一样的。类不知道该方法做什么，也无法控制它。Depending on what an alien method does，从同步区域调用它可能会导致异常、死锁或数据损坏。
 
 To make this concrete, consider the following class, which implements an observable set wrapper. It allows clients to subscribe to notifications when elements are added to the set. This is the Observer pattern [Gamma95]. For brevity’s sake, the class does not provide notifications when elements are removed from the set, but it would be a simple matter to provide them. This class is implemented atop the reusable ForwardingSet from Item 18 (page 90):
 
-要使这个问题具体化，请考虑下面的类，它实现了一个可视 Set 包装器。当元素被添加到集合中时，它允许客户端订阅通知。这是观察者模式 [Gamma95]。为了简单起见，当元素从集合中删除时，该类不提供通知，即使要提供通知也很简单。这个类是在 [Item-18](/Chapter-4/Chapter-4-Item-18-Favor-composition-over-inheritance.md)（第 90 页）的可复用 ForwardingSet 上实现的：
+要使这个问题具体化，请考虑下面的类，它实现了一个可观察的 Set 包装器。当元素被添加到集合中时，它允许客户端订阅通知。这是观察者模式 [Gamma95]。为了简单起见，当元素从集合中删除时，该类不提供通知，即使要提供通知也很简单。这个类是在 [Item-18](/Chapter-4/Chapter-4-Item-18-Favor-composition-over-inheritance.md)（第 90 页）的可复用 ForwardingSet 上实现的：
 
-```
+```java
 // Broken - invokes alien method from synchronized block!
 public class ObservableSet<E> extends ForwardingSet<E> {
     public ObservableSet(Set<E> set) { super(set); }
@@ -62,7 +62,7 @@ Observers subscribe to notifications by invoking the addObserver method and unsu
 
 观察者通过调用 addObserver 方法订阅通知，通过调用 removeObserver 方法取消订阅。在这两种情况下，都会将此回调接口的实例传递给方法。
 
-```
+```java
 @FunctionalInterface
 public interface SetObserver<E> {
     // Invoked when an element is added to the observable set
@@ -78,9 +78,9 @@ On cursory inspection, ObservableSet appears to work fine. For example, the foll
 
 粗略地检查一下，ObservableSet 似乎工作得很好。例如，下面的程序打印从 0 到 99 的数字：
 
-```
+```java
 public static void main(String[] args) {
-    ObservableSet<Integer> set =new ObservableSet<>(new HashSet<>());
+    ObservableSet<Integer> set = new ObservableSet<>(new HashSet<>());
     set.addObserver((s, e) -> System.out.println(e));
     for (int i = 0; i < 100; i++)
         set.add(i);
@@ -91,7 +91,7 @@ Now let’s try something a bit fancier. Suppose we replace the addObserver call
 
 现在让我们尝试一些更奇特的东西。假设我们将 addObserver 调用替换为一个传递观察者的调用，该观察者打印添加到集合中的整数值，如果该值为 23，则该调用将删除自身：
 
-```
+```java
 set.addObserver(new SetObserver<>() {
     public void added(ObservableSet<Integer> s, Integer e) {
         System.out.println(e);
@@ -107,13 +107,13 @@ Note that this call uses an anonymous class instance in place of the lambda used
 
 You might expect the program to print the numbers 0 through 23, after which the observer would unsubscribe and the program would terminate silently. In fact, it prints these numbers and then throws a ConcurrentModificationException. The problem is that notifyElementAdded is in the process of iterating over the observers list when it invokes the observer’s added method. The added method calls the observable set’s removeObserver method, which in turn calls the method observers.remove. Now we’re in trouble. We are trying to remove an element from a list in the midst of iterating over it, which is illegal. The iteration in the notifyElementAdded method is in a synchronized block to prevent concurrent modification, but it doesn’t prevent the iterating thread itself from calling back into the observable set and modifying its observers list.
 
-你可能希望程序打印数字 0 到 23，然后观察者将取消订阅，程序将无声地终止。实际上，它打印这些数字，然后抛出 ConcurrentModificationException。问题在于 notifyElementAdded 在调用观察者的 added 方法时，正在遍历 observers 列表。added 方法调用可观察集的 removeObserver 方法，该方法反过来调用方法 `observers.remove`。现在我们有麻烦了。我们试图在遍历列表的过程中从列表中删除一个元素，这是非法的。notifyElementAdded 方法中的迭代位于一个同步块中，以防止并发修改，但是无法防止迭代线程本身回调到可观察的集合中，也无法防止修改它的 observers 列表。
+你可能希望程序打印数字 0 到 23，然后观察者将取消订阅，程序将无声地终止。实际上，它打印这些数字，然后抛出 ConcurrentModificationException。问题在于 notifyElementAdded 在调用观察者的 added 方法时，正在遍历 observers 列表。added 方法调用可观察的集合的 removeObserver 方法，该方法反过来调用方法 `observers.remove`。现在我们有麻烦了。我们试图在遍历列表的过程中从列表中删除一个元素，这是非法的。notifyElementAdded 方法中的迭代位于一个同步块中，以防止并发修改，但是无法防止迭代线程本身回调到可观察的集合中，也无法防止修改它的 observers 列表。
 
 Now let’s try something odd: let’s write an observer that tries to unsubscribe, but instead of calling removeObserver directly, it engages the services of another thread to do the deed. This observer uses an executor service (Item 80):
 
 现在让我们尝试一些奇怪的事情：让我们编写一个观察者来尝试取消订阅，但是它没有直接调用 removeObserver，而是使用另一个线程的服务来执行这个操作。该观察者使用 executor 服务（[Item-80](/Chapter-11/Chapter-11-Item-80-Prefer-executors,-tasks,-and-streams-to-threads.md)）：
 
-```
+```java
 // Observer that uses a background thread needlessly
 set.addObserver(new SetObserver<>() {
     public void added(ObservableSet<Integer> s, Integer e) {
@@ -152,7 +152,7 @@ Luckily, it is usually not too hard to fix this sort of problem by moving alien 
 
 幸运的是，通过将外来方法调用移出同步块来解决这类问题通常并不难。对于 notifyElementAdded 方法，这涉及到获取观察者列表的「快照」，然后可以在没有锁的情况下安全地遍历该列表。有了这个改变，前面的两个例子都可以再也不会出现异常或者死锁了：
 
-```
+```java
 // Alien method moved outside of synchronized block - open calls
 private void notifyElementAdded(E element) {
     List<SetObserver<E>> snapshot = null;
@@ -172,7 +172,7 @@ The add and addAll methods of ObservableSet need not be changed if the list is m
 
 如果将 list 修改为使用 CopyOnWriteArrayList，则不需要更改 ObservableSet 的 add 和 addAll 方法。下面是类的其余部分。请注意，没有任何显式同步：
 
-```
+```java
 // Thread-safe observable set with CopyOnWriteArrayList
 private final List<SetObserver<E>> observers =new CopyOnWriteArrayList<>();
 
@@ -224,5 +224,6 @@ In summary, to avoid deadlock and data corruption, never call an alien method fr
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-11/Chapter-11-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 78: Synchronize access to shared mutable data（对共享可变数据的同步访问）](/Chapter-11/Chapter-11-Item-78-Synchronize-access-to-shared-mutable-data.md)**
 - **Next Item（下一条目）：[Item 80: Prefer executors, tasks, and streams to threads（Executor、task、流优于直接使用线程）](/Chapter-11/Chapter-11-Item-80-Prefer-executors,-tasks,-and-streams-to-threads.md)**
