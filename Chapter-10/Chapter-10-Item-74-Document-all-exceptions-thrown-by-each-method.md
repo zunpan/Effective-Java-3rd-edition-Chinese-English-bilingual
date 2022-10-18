@@ -8,7 +8,7 @@ A description of the exceptions thrown by a method is an important part of the d
 
 **Always declare checked exceptions individually, and document precisely the conditions under which each one is thrown** using the Javadoc @throws tag. Don’t take the shortcut of declaring that a method throws some superclass of multiple exception classes that it can throw. As an extreme example, don’t declare that a public method throws Exception or, worse, throws Throwable. In addition to denying any guidance to the method’s user concerning the exceptions it is capable of throwing, such a declaration greatly hinders the use of the method because it effectively obscures any other exception that may be thrown in the same context. One exception to this advice is the main method, which can safely be declared to throw Exception because it is called only by VM.
 
-**始终单独声明 checked 异常，并使用 Javadoc 的 `@throw` 标记精确记录每次抛出异常的条件**。如果一个方法抛出多个异常，不要使用快捷方式声明这些异常的超类。作为一个极端的例子，即不要在公共方法声明 `throws Exception`，或者更糟，甚至 `throws Throwable`。除了不能向方法的用户提供会抛出哪些异常的任何消息之外，这样的声明还极大地阻碍了方法的使用，因为它掩盖了在相同上下文中可能抛出的任何其他异常。这个建议的一个特例是 main 方法，它可以安全地声明 `throw Exception`，因为它只被 VM 调用。
+**始终单独声明 checked 异常，并使用 Javadoc 的 `@throw` 标记精确记录每次抛出异常的条件**。如果一个方法抛出多个异常，不要使用快捷方式声明这些异常的父类。作为一个极端的例子，即不要在公共方法声明 `throws Exception`，或者更糟，甚至 `throws Throwable`。除了不能向方法的用户提供会抛出哪些异常的任何消息之外，这样的声明还极大地阻碍了方法的使用，因为它掩盖了在相同上下文中可能抛出的任何其他异常。这个建议的一个特例是 main 方法，它可以安全地声明 `throw Exception`，因为它只被 VM 调用。
 
 While the language does not require programmers to declare the unchecked exceptions that a method is capable of throwing, it is wise to document them as carefully as the checked exceptions. Unchecked exceptions generally represent programming errors (Item 70), and familiarizing programmers with all of the errors they can make helps them avoid making these errors. A well-documented list of the unchecked exceptions that a method can throw effectively describes the preconditions for its successful execution. It is essential that every public method’s documentation describe its preconditions (Item 56), and documenting its unchecked exceptions is the best way to satisfy this requirement.
 
@@ -36,5 +36,6 @@ In summary, document every exception that can be thrown by each method that you 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 73: Throw exceptions appropriate to the abstraction（抛出能用抽象解释的异常）](/Chapter-10/Chapter-10-Item-73-Throw-exceptions-appropriate-to-the-abstraction.md)**
 - **Next Item（下一条目）：[Item 75: Include failure capture information in detail messages（异常详细消息中应包含捕获失败的信息）](/Chapter-10/Chapter-10-Item-75-Include-failure-capture-information-in-detail-messages.md)**
