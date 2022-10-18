@@ -14,7 +14,7 @@ For methods that operate on mutable objects, the most common way to achieve fail
 
 对于操作可变对象的方法，实现故障原子性的最常见方法是在执行操作之前检查参数的有效性（[Item-49](/Chapter-8/Chapter-8-Item-49-Check-parameters-for-validity.md)）。这使得大多数异常在对象修改开始之前被抛出。例如，考虑 `Stack.pop` 方法（[Item-7](/Chapter-2/Chapter-2-Item-7-Eliminate-obsolete-object-references.md)）：
 
-```
+```java
 public Object pop() {
     if (size == 0)
         throw new EmptyStackException();
@@ -30,7 +30,7 @@ If the initial size check were eliminated, the method would still throw an excep
 
 A closely related approach to achieving failure atomicity is to order the computation so that any part that may fail takes place before any part that modifies the object. This approach is a natural extension of the previous one when arguments cannot be checked without performing a part of the computation. For example, consider the case of TreeMap, whose elements are sorted according to some ordering. In order to add an element to a TreeMap, the element must be of a type that can be compared using the TreeMap’s ordering. Attempting to add an incorrectly typed element will naturally fail with a ClassCastException as a result of searching for the element in the tree, before the tree has been modified in any way.
 
-实现故障原子性的另一种方式是对计算进行排序，以便可能发生故障的部分都先于修改对象的部分发生。当执行某部分计算才能检查参数时，这种方法是前一种方法的自然扩展。例如，考虑 TreeMap 的情况，它的元素按照一定的顺序排序。为了向 TreeMap 中添加元素，元素的类型必须能够使用 TreeMap 的顺序进行比较。在以任何方式修改「树」之前，由于在「树」中搜索元素，试图添加类型不正确的元素自然会失败，并导致 ClassCastException 异常。
+实现故障原子性的另一种方式是对计算进行排序，以便可能发生故障的部分都先于修改对象的部分发生。当执行某部分计算才能检查参数时，这种方法是前一种方法的自然扩展。例如，考虑 TreeMap 的情况，它的元素按照一定的顺序排序。为了向 TreeMap 中添加元素，元素的类型必须能够使用 TreeMap 的顺序进行比较。在以任何方式修改「树」之前，先在「树」中搜索元素，试图添加类型不正确的元素自然会失败，并导致 ClassCastException 异常。
 
 A third approach to achieving failure atomicity is to perform the operation on a temporary copy of the object and to replace the contents of the object with the temporary copy once the operation is complete. This approach occurs naturally when the computation can be performed more quickly once the data has been stored in a temporary data structure. For example, some sorting functions copy their input list into an array prior to sorting to reduce the cost of accessing elements in the inner loop of the sort. This is done for performance, but as an added benefit, it ensures that the input list will be untouched if the sort fails.
 
@@ -54,5 +54,6 @@ In summary, as a rule, any generated exception that is part of a method’s spec
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 75: Include failure capture information in detail messages（异常详细消息中应包含捕获失败的信息）](/Chapter-10/Chapter-10-Item-75-Include-failure-capture-information-in-detail-messages.md)**
 - **Next Item（下一条目）：[Item 77: Don’t ignore exceptions（不要忽略异常）](/Chapter-10/Chapter-10-Item-77-Don’t-ignore-exceptions.md)**
