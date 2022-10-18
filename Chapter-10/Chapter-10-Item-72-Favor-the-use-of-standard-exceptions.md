@@ -16,7 +16,7 @@ The most commonly reused exception type is IllegalArgumentException (Item 49). T
 
 Another commonly reused exception is IllegalStateException. This is generally the exception to throw if the invocation is illegal because of the state of the receiving object. For example, this would be the exception to throw if the caller attempted to use some object before it had been properly initialized.
 
-另一个常被复用异常是 IllegalStateException。如果接收对象的状态导致调用非法，则通常会抛出此异常。例如，如果调用者试图在对象被正确初始化之前使用它，那么这将是抛出的异常。
+另一个常被复用异常是 IllegalStateException。如果因为接收对象的状态导致调用非法，则通常会抛出此异常。例如，如果调用者试图在对象被正确初始化之前使用它，那么这将是抛出的异常。
 
 Arguably, every erroneous method invocation boils down to an illegal argument or state, but other exceptions are standardly used for certain kinds of illegal arguments and states. If a caller passes null in some parameter for which null values are prohibited, convention dictates that NullPointerException be thrown rather than IllegalArgumentException. Similarly, if a caller passes an out-of-range value in a parameter representing an index into a sequence, IndexOutOfBoundsException should be thrown rather than IllegalArgumentException.
 
@@ -32,12 +32,11 @@ A last standard exception of note is UnsupportedOperationException. This is the 
 
 **Do not reuse Exception, RuntimeException, Throwable, or Error directly.** Treat these classes as if they were abstract. You can't reliably test for these exceptions because they are superclasses of other exceptions that a method may throw.
 
-**不要直接复用 Exception、RuntimeException、Throwable 或 Error。** 应当将这些类视为抽象类。你不能对这些异常进行可靠的测试，因为它们是方法可能抛出的异常的超类。
+**不要直接复用 Exception、RuntimeException、Throwable 或 Error。** 应当将这些类视为抽象类。你不能对这些异常进行可靠的测试，因为它们是方法可能抛出的异常的父类。
 
 This table summarizes the most commonly reused exceptions:
 
 此表总结了最常见的可复用异常：
-
 
 |    Exception    |       Occasion for Use       |
 |:-------:|:-------:|
@@ -50,7 +49,7 @@ This table summarizes the most commonly reused exceptions:
 
 While these are by far the most commonly reused exceptions, others may be reused where circumstances warrant. For example, it would be appropriate to reuse ArithmeticException and NumberFormatException if you were implementing arithmetic objects such as complex numbers or rational numbers. If an exception fits your needs, go ahead and use it, but only if the conditions under which you would throw it are consistent with the exception’s documentation: reuse must be based on documented semantics, not just on name. Also, feel free to subclass a standard exception if you want to add more detail (Item 75), but remember that exceptions are serializable (Chapter 12). That alone is reason not to write your own exception class without good reason.
 
-虽然到目前为止，这些是最常见的复用异常，但是在环境允许的情况下也可以复用其他异常。例如，如果你正在实现诸如复数或有理数之类的算术对象，那么复用 ArithmeticException 和 NumberFormatException 是合适的。如果一个异常符合你的需要，那么继续使用它，但前提是你抛出它的条件与异常的文档描述一致：复用必须基于文档化的语义，而不仅仅是基于名称。另外，如果你想添加更多的细节，可以随意子类化标准异常(第75项)，但是请记住，异常是可序列化的（Chapter 12）。如果没有充分的理由，不要编写自己的异常类。
+虽然到目前为止，这些是最常见的复用异常，但是在环境允许的情况下也可以复用其他异常。例如，如果你正在实现诸如复数或有理数之类的算术对象，那么复用 ArithmeticException 和 NumberFormatException 是合适的。如果一个异常符合你的需要，那么继续使用它，但前提是你抛出它的条件与异常的文档描述一致：复用必须基于文档化的语义，而不仅仅是基于名称。另外，如果你想添加更多的细节，可以随意子类化标准异常(Item 75)，但是请记住，异常是可序列化的（Chapter 12）。如果没有充分的理由，不要编写自己的异常类。
 
 Choosing which exception to reuse can be tricky because the “occasions for use” in the table above do not appear to be mutually exclusive. Consider the case of an object representing a deck of cards, and suppose there were a method to deal a hand from the deck that took as an argument the size of the hand. If the caller passed a value larger than the number of cards remaining in the deck, it could be construed as an IllegalArgumentException (the handSize parameter value is too high) or an IllegalStateException (the deck contains too few cards). Under these circumstances, the rule is to throw IllegalStateException if no argument values would have worked, otherwise throw IllegalArgumentException.
 
@@ -58,5 +57,6 @@ Choosing which exception to reuse can be tricky because the “occasions for use
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-10/Chapter-10-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 71: Avoid unnecessary use of checked exceptions（避免不必要地使用 checked 异常）](/Chapter-10/Chapter-10-Item-71-Avoid-unnecessary-use-of-checked-exceptions.md)**
 - **Next Item（下一条目）：[Item 73: Throw exceptions appropriate to the abstraction（抛出能用抽象解释的异常）](/Chapter-10/Chapter-10-Item-73-Throw-exceptions-appropriate-to-the-abstraction.md)**
