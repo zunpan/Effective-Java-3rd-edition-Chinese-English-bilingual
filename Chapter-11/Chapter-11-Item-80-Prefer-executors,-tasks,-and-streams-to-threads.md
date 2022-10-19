@@ -4,19 +4,25 @@
 
 The first edition of this book contained code for a simple work queue [Bloch01, Item 49]. This class allowed clients to enqueue work for asynchronous processing by a background thread. When the work queue was no longer needed, the client could invoke a method to ask the background thread to terminate itself gracefully after completing any work that was already on the queue. The implementation was little more than a toy, but even so, it required a full page of subtle, delicate code, of the sort that is prone to safety and liveness failures if you don’t get it just right. Luckily, there is no reason to write this sort of code anymore.
 
-本书的第一版包含一个简单工作队列的代码 [Bloch01, Item 49]。这个类允许客户端通过后台线程为异步处理排队。当不再需要工作队列时，客户端可以调用一个方法，要求后台线程在完成队列上的任何工作后优雅地终止自己。这个实现只不过是一个玩具，但即便如此，它也需要一整页的代码，如果你做得不对，就很容易出现安全和活性失败。幸运的是，没有理由再编写这种代码了。
+本书的第一版包含一个简单工作队列的代码 [Bloch01, Item 49]。这个类允许客户端通过后台线程为异步处理排队。当不再需要工作队列时，客户端可以调用一个方法，要求后台线程在完成队列上的所有工作后优雅地终止自己。这个实现只不过是一个玩具，但即便如此，它也需要一整页的代码，如果你做得不对，就很容易出现安全问题和活性失败。幸运的是，没有理由再编写这种代码了。
 
 By the time the second edition of this book came out, java.util.concurrent had been added to Java. This package contains an Executor Framework, which is a flexible interface-based task execution facility. Creating a work queue that is better in every way than the one in the first edition of this book requires but a single line of code:
 
 当这本书的第二版出版时，`java.util.concurrent` 已经添加到 Java 中。这个包有一个 Executor 框架，它是一个灵活的基于接口的任务执行工具。创建一个工作队列，它在任何方面都比在这本书的第一版更好，只需要一行代码：
 
-```
+```java
 ExecutorService exec = Executors.newSingleThreadExecutor();
+```
 
 Here is how to submit a runnable for execution:
+
+```java
 exec.execute(runnable);
+```
 
 And here is how to tell the executor to terminate gracefully (if you fail to do this,it is likely that your VM will not exit):
+
+```java
 exec.shutdown();
 ```
 
@@ -47,5 +53,6 @@ A complete treatment of the Executor Framework is beyond the scope of this book,
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-11/Chapter-11-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 79: Avoid excessive synchronization（避免过度同步）](/Chapter-11/Chapter-11-Item-79-Avoid-excessive-synchronization.md)**
 - **Next Item（下一条目）：[Item 81: Prefer concurrency utilities to wait and notify（并发实用工具优于 wait 和 notify）](/Chapter-11/Chapter-11-Item-81-Prefer-concurrency-utilities-to-wait-and-notify.md)**
