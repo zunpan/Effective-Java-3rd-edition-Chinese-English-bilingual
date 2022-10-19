@@ -30,7 +30,7 @@ Without using any gadgets, you can easily mount a denial-of-service attack by ca
 
 不使用任何 gadget，你都可以通过对需要很长时间才能反序列化的短流进行反序列化，轻松地发起拒绝服务攻击。这种流被称为反序列化炸弹 [Svoboda16]。下面是 Wouter Coekaerts 的一个例子，它只使用哈希集和字符串 [Coekaerts15]：
 
-```
+```Java
 // Deserialization bomb - deserializing this stream takes forever
 static byte[] bomb() {
     Set<Object> root = new HashSet<>();
@@ -87,5 +87,6 @@ In summary, serialization is dangerous and should be avoided. If you are designi
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-12/Chapter-12-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 84: Don’t depend on the thread scheduler（不要依赖线程调度器）](/Chapter-11/Chapter-11-Item-84-Don’t-depend-on-the-thread-scheduler.md)**
 - **Next Item（下一条目）：[Item 86: Implement Serializable with great caution（非常谨慎地实现 Serializable）](/Chapter-12/Chapter-12-Item-86-Implement-Serializable-with-great-caution.md)**
