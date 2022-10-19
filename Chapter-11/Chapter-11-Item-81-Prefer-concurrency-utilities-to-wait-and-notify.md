@@ -16,13 +16,13 @@ The concurrent collections are high-performance concurrent implementations of st
 
 Because you can’t exclude concurrent activity on concurrent collections, you can’t atomically compose method invocations on them either. Therefore, concurrent collection interfaces were outfitted with state-dependent modify operations, which combine several primitives into a single atomic operation. These operations proved sufficiently useful on concurrent collections that they were added to the corresponding collection interfaces in Java 8, using default methods (Item 21).
 
-因为不能排除并发集合上的并发活动，所以也不能原子地组合对它们的方法调用。因此，并发集合接口配备了依赖于状态的修改操作，这些操作将多个基本操作组合成单个原子操作。这些操作在并发集合上非常有用，因此使用默认方法（[Item-21](/Chapter-4/Chapter-4-Item-21-Design-interfaces-for-posterity.md)）将它们添加到 Java 8 中相应的集合接口。
+因为不能排除并发集合上的并发活动，所以也不能原子地组合对它们的方法调用。因此，并发集合接口配备了依赖于状态的修改操作，这些操作将多个基本操作组合成单个原子操作。这些操作被证明对并发集合非常有用，因此Java 8将它们添加到了相应的集合接口中，使用了 default 方法（[Item-21](/Chapter-4/Chapter-4-Item-21-Design-interfaces-for-posterity.md)）
 
 For example, Map’s putIfAbsent(key, value) method inserts a mapping for a key if none was present and returns the previous value associated with the key, or null if there was none. This makes it easy to implement thread-safe canonicalizing maps. This method simulates the behavior of String.intern:
 
 例如，Map 的 `putIfAbsent(key, value)` 方法为一个没有映射的键插入一个映射，并返回与键关联的前一个值，如果没有，则返回 null。这使得实现线程安全的规范化 Map 变得很容易。这个方法模拟了 `String.intern` 的行为。
 
-```
+```java
 // Concurrent canonicalizing map atop ConcurrentMap - not optimal
 private static final ConcurrentMap<String, String> map =new ConcurrentHashMap<>();
 public static String intern(String s) {
@@ -35,7 +35,7 @@ In fact, you can do even better. ConcurrentHashMap is optimized for retrieval op
 
 事实上，你可以做得更好。ConcurrentHashMap 针对 get 等检索操作进行了优化。因此，只有在 get 表明有必要时，才值得首先调用 get 再调用 putIfAbsent:
 
-```
+```java
 // Concurrent canonicalizing map atop ConcurrentMap - faster!
 public static String intern(String s) {
     String result = map.get(s);
@@ -68,7 +68,7 @@ It is surprisingly easy to build useful things atop this simple primitive. For e
 
 在这个简单的基本类型上构建有用的东西非常容易。例如，假设你想要构建一个简单的框架来为一个操作的并发执行计时。这个框架由一个方法组成，该方法使用一个 executor 来执行操作，一个并发级别表示要并发执行的操作的数量，一个 runnable 表示操作。所有工作线程都准备在 timer 线程启动时钟之前运行操作。当最后一个工作线程准备好运行该操作时，计时器线程「发令枪」，允许工作线程执行该操作。一旦最后一个工作线程完成该操作，计时器线程就停止时钟。在 wait 和 notify 的基础上直接实现这种逻辑至少会有点麻烦，但是在 CountDownLatch 的基础上实现起来却非常简单：
 
-```
+```java
 // Simple framework for timing concurrent execution
 public static long time(Executor executor, int concurrency,Runnable action) throws InterruptedException {
     CountDownLatch ready = new CountDownLatch(concurrency);
@@ -113,7 +113,7 @@ While you should always use the concurrency utilities in preference to wait and 
 
 虽然你应该始终优先使用并发实用工具，而不是使用 wait 和 notify，但是你可能必须维护使用 wait 和 notify 的遗留代码。wait 方法用于使线程等待某个条件。它必须在同步区域内调用，该同步区域将锁定调用它的对象。下面是使用 wait 方法的标准形式：
 
-```
+```java
 // The standard idiom for using the wait method
 synchronized (obj) {
     while (<condition does not hold>)
@@ -168,5 +168,6 @@ In summary, using wait and notify directly is like programming in “concurrency
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-11/Chapter-11-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 80: Prefer executors, tasks, and streams to threads（Executor、task、流优于直接使用线程）](/Chapter-11/Chapter-11-Item-80-Prefer-executors,-tasks,-and-streams-to-threads.md)**
 - **Next Item（下一条目）：[Item 82: Document thread safety（文档应包含线程安全属性）](/Chapter-11/Chapter-11-Item-82-Document-thread-safety.md)**
