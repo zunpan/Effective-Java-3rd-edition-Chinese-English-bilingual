@@ -22,7 +22,7 @@ In the presence of multiple threads, lazy initialization is tricky. If two or mo
 
 **在大多数情况下，常规初始化优于延迟初始化。** 下面是一个使用常规初始化的实例字段的典型声明。注意 final 修饰符的使用（[Item-17](/Chapter-4/Chapter-4-Item-17-Minimize-mutability.md)）：
 
-```
+```java
 // Normal initialization of an instance field
 private final FieldType field = computeFieldValue();
 ```
@@ -31,7 +31,7 @@ private final FieldType field = computeFieldValue();
 
 **如果您使用延迟初始化来取代初始化 circularity，请使用同步访问器**，因为它是最简单、最清晰的替代方法：
 
-```
+```java
 // Lazy initialization of instance field - synchronized accessor
 private FieldType field;
 private synchronized FieldType getField() {
@@ -43,13 +43,13 @@ private synchronized FieldType getField() {
 
 Both of these idioms (normal initialization and lazy initialization with a synchronized accessor) are unchanged when applied to static fields, except that you add the static modifier to the field and accessor declarations.
 
-这两种习惯用法（使用同步访问器进行常规初始化和延迟初始化）在应用于静态字段时都没有改变，只是在字段和访问器声明中添加了 static 修饰符。
+这两种习惯用法（使用同步访问器进行常规初始化和延迟初始化）在应用于静态字段时都没有变化，只是在字段和访问器声明中添加了 static 修饰符。
 
 **If you need to use lazy initialization for performance on a static field, use the lazy initialization holder class idiom.** This idiom exploits the guarantee that a class will not be initialized until it is used [JLS, 12.4.1]. Here’s how it looks:
 
-**如果需要在静态字段上使用延迟初始化来提高性能，use the lazy initialization holder class idiom.** 这个用法可保证一个类在使用之前不会被初始化 [JLS, 12.4.1]。它是这样的：
+**如果需要在静态字段上使用延迟初始化来提高性能，使用延迟初始化的 holder class 用法.** 这个用法可保证一个类在使用之前不会被初始化 [JLS, 12.4.1]。它是这样的：
 
-```
+```java
 // Lazy initialization holder class idiom for static fields
 private static class FieldHolder {
     static final FieldType field = computeFieldValue();
@@ -59,13 +59,13 @@ private static FieldType getField() { return FieldHolder.field; }
 
 When getField is invoked for the first time, it reads FieldHolder.field for the first time, causing the initialization of the FieldHolder class. The beauty of this idiom is that the getField method is not synchronized and performs only a field access, so lazy initialization adds practically nothing to the cost of access. A typical VM will synchronize field access only to initialize the class. Once the class is initialized, the VM patches the code so that subsequent access to the field does not involve any testing or synchronization.
 
-第一次调用 getField 时，它执行 FieldHolder.field，导致初始化 FieldHolder 类。这个习惯用法的优点是 getField 方法不是同步的，只执行字段访问，所以延迟初始化实际上不会增加访问成本。典型的 VM 只会同步字段访问来初始化类。初始化类之后，VM 会对代码进行修补，这样对字段的后续访问就不会涉及任何测试或同步。
+第一次调用 getField 时，它执行 FieldHolder.field，导致初始化 FieldHolder 类。这个习惯用法的优点是 getField 方法不是同步的，只会访问一个字段，所以延迟初始化实际上不会增加访问成本。典型的VM只在初始化类时才会同步访问字段。一旦类初始化之后，VM 会对代码进行修补，这样对字段的后续访问就不会涉及任何测试或同步。
 
 **If you need to use lazy initialization for performance on an instance field, use the double-check idiom.** This idiom avoids the cost of locking when accessing the field after initialization (Item 79). The idea behind the idiom is to check the value of the field twice (hence the name double-check): once without locking and then, if the field appears to be uninitialized, a second time with locking. Only if the second check indicates that the field is uninitialized does the call initialize the field. Because there is no locking once the field is initialized, it is critical that the field be declared volatile (Item 78). Here is the idiom:
 
 如果需要使用延迟初始化来提高实例字段的性能，请使用双重检查模式。这个模式避免了初始化后访问字段时的锁定成本（[Item-79](/Chapter-11/Chapter-11-Item-79-Avoid-excessive-synchronization.md)）。这个模式背后的思想是两次检查字段的值（因此得名 double check）：一次没有锁定，然后，如果字段没有初始化，第二次使用锁定。只有当第二次检查指示字段未初始化时，调用才初始化字段。由于初始化字段后没有锁定，因此将字段声明为 volatile 非常重要（[Item-78](/Chapter-11/Chapter-11-Item-78-Synchronize-access-to-shared-mutable-data.md)）。下面是这个模式的示例：
 
-```
+```java
 // Double-check idiom for lazy initialization of instance fields
 private volatile FieldType field;
 private FieldType getField() {
@@ -92,7 +92,7 @@ Two variants of the double-check idiom bear noting. Occasionally, you may need t
 
 双重检查模式的两个变体值得注意。有时候，您可能需要延迟初始化一个实例字段，该字段可以容忍重复初始化。如果您发现自己处于这种情况，您可以使用双重检查模式的变体来避免第二个检查。毫无疑问，这就是所谓的「单检查」模式。它是这样的。注意，field 仍然声明为 volatile：
 
-```
+```java
 // Single-check idiom - can cause repeated initialization!
 private volatile FieldType field;
 private FieldType getField() {
@@ -113,9 +113,10 @@ If you don’t care whether every thread recalculates the value of a field, and 
 
 In summary, you should initialize most fields normally, not lazily. If you must initialize a field lazily in order to achieve your performance goals or to break a harmful initialization circularity, then use the appropriate lazy initialization technique. For instance fields, it is the double-check idiom; for static fields, the lazy initialization holder class idiom. For instance fields that can tolerate repeated initialization, you may also consider the single-check idiom.
 
-总之，您应该正常初始化大多数字段，而不是延迟初始化。如果必须延迟初始化字段以实现性能目标或 break a harmful initialization circularity，则使用适当的延迟初始化技术。对于字段，使用双重检查模式；对于静态字段，the lazy initialization holder class idiom. 例如，可以容忍重复初始化的实例字段，您还可以考虑单检查模式。
+总之，您应该正常初始化大多数字段，而不是延迟初始化。如果必须延迟初始化字段以实现性能目标或打破一个有害的循环初始化，则使用适当的延迟初始化技术。对于实例字段，使用双重检查模式；对于静态字段，使用延迟初始化的 holder class。 对于可以容忍重复初始化的实例字段，您还可以考虑单检查模式。
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-11/Chapter-11-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 82: Document thread safety（文档应包含线程安全属性）](/Chapter-11/Chapter-11-Item-82-Document-thread-safety.md)**
 - **Next Item（下一条目）：[Item 84: Don’t depend on the thread scheduler（不要依赖线程调度器）](/Chapter-11/Chapter-11-Item-84-Don’t-depend-on-the-thread-scheduler.md)**
