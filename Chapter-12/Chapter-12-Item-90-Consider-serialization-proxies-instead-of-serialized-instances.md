@@ -8,13 +8,13 @@ As mentioned in Items 85 and 86 and discussed throughout this chapter, the decis
 
 The serialization proxy pattern is reasonably straightforward. First, design a private static nested class that concisely represents the logical state of an instance of the enclosing class. This nested class is known as the serialization proxy of the enclosing class. It should have a single constructor, whose parameter type is the enclosing class. This constructor merely copies the data from its argument: it need not do any consistency checking or defensive copying. By design, the default serialized form of the serialization proxy is the perfect serialized form of the enclosing class. Both the enclosing class and its serialization proxy must be declared to implement Serializable.
 
-序列化代理模式相当简单。首先，设计一个私有静态嵌套类，它简洁地表示外围类实例的逻辑状态。这个嵌套类称为外围类的序列化代理。它应该有一个构造函数，其参数类型是外围类。这个构造函数只是从它的参数复制数据：它不需要做任何一致性检查或防御性复制。按照设计，序列化代理的默认序列化形式是外围类的完美序列化形式。外围类及其序列代理都必须声明实现 Serializable 接口。
+序列化代理模式相当简单。首先，设计一个私有静态嵌套类，它简洁地表示外围类实例的逻辑状态。这个嵌套类称为外围类的序列化代理。它应该有一个构造函数，其参数类型是外围类。这个构造函数只是从它的参数复制数据：它不需要做任何一致性检查或防御性复制。按照设计，序列化代理的默认序列化形式是外围类的完美序列化形式。外围类及其序列化代理都必须声明实现 Serializable 接口。
 
 For example, consider the immutable Period class written in Item 50 and made serializable in Item 88. Here is a serialization proxy for this class. Period is so simple that its serialization proxy has exactly the same fields as the class:
 
 例如，考虑 [Item-50](/Chapter-8/Chapter-8-Item-50-Make-defensive-copies-when-needed.md) 中编写的不可变 Period 类，并在 [Item-88](/Chapter-12/Chapter-12-Item-88-Write-readObject-methods-defensively.md) 中使其可序列化。这是该类的序列化代理。Period 非常简单，它的序列化代理具有与类完全相同的字段：
 
-```
+```java
 // Serialization proxy for Period class
 private static class SerializationProxy implements Serializable {
     private final Date start;
@@ -31,7 +31,7 @@ Next, add the following writeReplace method to the enclosing class. This method 
 
 接下来，将以下 writeReplace 方法添加到外围类中。通过序列化代理，这个方法可以被逐字地复制到任何类中：
 
-```
+```java
 // writeReplace method for the serialization proxy pattern
 private Object writeReplace() {
     return new SerializationProxy(this);
@@ -46,7 +46,7 @@ With this writeReplace method in place, the serialization system will never gene
 
 有了这个 writeReplace 方法，序列化系统将永远不会生成外围类的序列化实例，但是攻击者可能会创建一个实例，试图违反类的不变性。为了保证这样的攻击会失败，只需将这个 readObject 方法添加到外围类中：
 
-```
+```java
 // readObject method for the serialization proxy pattern
 private void readObject(ObjectInputStream stream) throws InvalidObjectException {
     throw new InvalidObjectException("Proxy required");
@@ -65,7 +65,7 @@ Here is the readResolve method for Period.SerializationProxy above:
 
 以下是上述 `Period.SerializationProxy` 的 readResolve 方法：
 
-```
+```java
 // readResolve method for Period.SerializationProxy
 private Object readResolve() {
     return new Period(start, end); // Uses public constructor
@@ -88,7 +88,7 @@ Now consider what happens if you serialize an enum set whose enum type has sixty
 
 现在考虑，如果序列化一个枚举集合，它的枚举类型有 60 个元素，然后给这个枚举类型再增加 5 个元素，之后反序列化这个枚举集合。当它被序列化的时候，返回 RegularEnumSet 实例，但最好是 JumboEnumSet 实例。事实上正是这样，因为 EnumSet 使用序列化代理模式。如果你好奇，这里是 EnumSet 的序列化代理。其实很简单：
 
-```
+```java
 // EnumSet's serialization proxy
 private static class SerializationProxy <E extends Enum<E>> implements Serializable {
     // The element type of this enum set.
@@ -127,4 +127,5 @@ In summary, consider the serialization proxy pattern whenever you find yourself 
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-12/Chapter-12-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 89: For instance control prefer enum types to readResolve（对于实例控制，枚举类型优于 readResolve）](/Chapter-12/Chapter-12-Item-89-For-instance-control-prefer-enum-types-to-readResolve.md)**
