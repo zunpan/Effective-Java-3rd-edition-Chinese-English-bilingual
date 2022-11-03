@@ -7,6 +7,7 @@ This chapter concerns（关注、涉及） creating and destroying objects: when
 本章涉及创建和销毁对象：何时以及如何创建对象，何时以及如何避免创建对象，如何确保它们被及时销毁，以及如何管理在销毁之前必须执行的清理操作。
 
 ### Contents of the chapter（章节目录）
+
 - [Item 1: Consider static factory methods instead of constructors（考虑以静态工厂方法代替构造函数）](/Chapter-2/Chapter-2-Item-1-Consider-static-factory-methods-instead-of-constructors.md)
 - [Item 2: Consider a builder when faced with many constructor parameters（在面对多个构造函数参数时，请考虑构建器）](/Chapter-2/Chapter-2-Item-2-Consider-a-builder-when-faced-with-many-constructor-parameters.md)
 - [Item 3: Enforce the singleton property with a private constructor or an enum type（使用私有构造函数或枚举类型实施单例属性）](/Chapter-2/Chapter-2-Item-3-Enforce-the-singleton-property-with-a-private-constructor-or-an-enum-type.md)
