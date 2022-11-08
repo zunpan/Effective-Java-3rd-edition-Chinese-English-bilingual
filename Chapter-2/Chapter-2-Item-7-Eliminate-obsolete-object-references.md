@@ -10,7 +10,7 @@ Consider the following simple stack implementation:
 
 考虑以下简单的堆栈实现：
 
-```
+```java
 import java.util.Arrays;
 import java.util.EmptyStackException;
 
@@ -62,7 +62,7 @@ The fix for this sort of problem is simple: null out references once they become
 
 解决这类问题的方法很简单：一旦引用过时，就将置空。在我们的 Stack 类中，对某个项的引用一旦从堆栈中弹出就会过时。pop 方法的正确版本如下：
 
-```
+```java
 public Object pop() {
     if (size == 0)
         throw new EmptyStackException();
@@ -106,5 +106,6 @@ Because memory leaks typically do not manifest themselves as obvious failures, t
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-2/Chapter-2-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 6: Avoid creating unnecessary objects（避免创建不必要的对象）](/Chapter-2/Chapter-2-Item-6-Avoid-creating-unnecessary-objects.md)**
 - **Next Item（下一条目）：[Item 8: Avoid finalizers and cleaners（避免使用终结器和清除器）](/Chapter-2/Chapter-2-Item-8-Avoid-finalizers-and-cleaners.md)**
