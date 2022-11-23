@@ -37,7 +37,7 @@ You might expect this program to print Set, followed by List and Unknown Collect
 
 The behavior of this program is counterintuitive because **selection among overloaded methods is static, while selection among overridden methods is dynamic.** The correct version of an overridden method is chosen at runtime, based on the runtime type of the object on which the method is invoked. As a reminder, a method is overridden when a subclass contains a method declaration with the same signature as a method declaration in an ancestor. If an instance method is overridden in a subclass and this method is invoked on an instance of the subclass, the subclass’s overriding method executes, regardless of the compile-time type of the subclass instance. To make this concrete, consider the following program:
 
-这个程序的行为违反常规，因为 **重载方法的选择是静态的，而重写方法的选择是动态的。** 在运行时根据调用方法的对象的运行时类型选择重写方法的正确版本。提醒一下，当子类包含与祖先中的方法声明具有相同签名的方法声明时，方法将被重写。如果在子类中重写实例方法，并且在子类的实例上调用此方法，则执行子类的重写方法，而不管子类实例的编译时类型如何。为了更具体的说明，考虑以下程序:
+这个程序的行为违反常规，因为 **重载方法的选择是静态的，而覆盖方法的选择是动态的。** 在运行时根据调用方法的对象的运行时类型选择覆盖方法的正确版本。提醒一下，当子类包含与祖先中的方法声明具有相同签名的方法声明时，方法将被覆盖。如果在子类中覆盖实例方法，并且在子类的实例上调用此方法，则执行子类的覆盖方法，而不管子类实例的编译时类型如何。为了更具体的说明，考虑以下程序:
 
 ```java
 class Wine {
@@ -65,7 +65,7 @@ public class Overriding {
 
 The name method is declared in class Wine and overridden in subclasses SparklingWine and Champagne. As you would expect, this program prints out wine, sparkling wine, and champagne, even though the compiletime type of the instance is Wine in each iteration of the loop. The compile-time type of an object has no effect on which method is executed when an overridden method is invoked; the “most specific” overriding method always gets executed. Compare this to overloading, where the runtime type of an object has no effect on which overloading is executed; the selection is made at compile time, based entirely on the compile-time types of the parameters.
 
-name 方法在 Wine 类中声明，并在 SparklingWine 和 Champagne 子类中重写。正如你所期望的，这个程序打印出 wine、sparkling 和 champagne，即使实例的编译时类型是循环每次迭代中的 wine。对象的编译时类型对调用重写方法时执行的方法没有影响；「最特定的」重写方法总是被执行。将此与重载进行比较，在重载中，对象的运行时类型对执行重载没有影响；选择是在编译时进行的，完全基于参数的编译时类型。
+name 方法在 Wine 类中声明，并在 SparklingWine 和 Champagne 子类中覆盖。正如你所期望的，这个程序打印出 wine、sparkling 和 champagne，即使实例的编译时类型是循环每次迭代中的 wine。对象的编译时类型对调用覆盖方法时执行的方法没有影响；「最特定的」覆盖方法总是被执行。将此与重载进行比较，在重载中，对象的运行时类型对执行重载没有影响；选择是在编译时进行的，完全基于参数的编译时类型。
 
 In the CollectionClassifier example, the intent of the program was to discern the type of the parameter by dispatching automatically to the appropriate method overloading based on the runtime type of the parameter, just as the name method did in the Wine example. Method overloading simply does not provide this functionality. Assuming a static method is required, the best way to fix the CollectionClassifier program is to replace all three overloadings of classify with a single method that does explicit instanceof tests:
 
@@ -79,7 +79,7 @@ public static String classify(Collection<?> c) {
 
 Because overriding is the norm and overloading is the exception, overriding sets people’s expectations for the behavior of method invocation. As demonstrated by the CollectionClassifier example, overloading can easily confound these expectations. It is bad practice to write code whose behavior is likely to confuse programmers. This is especially true for APIs. If the typical user of an API does not know which of several method overloadings will get invoked for a given set of parameters, use of the API is likely to result in errors. These errors will likely manifest themselves as erratic behavior at runtime, and many programmers will have a hard time diagnosing them. Therefore you should **avoid confusing uses of overloading.**
 
-因为重写是常态，而重载是例外，所以重写满足了人们对方法调用行为的期望。正如 CollectionClassifier 示例所示，重载很容易混淆这些期望。编写可能使程序员感到困惑的代码是不好的行为。对于 API 尤其如此。如果 API 的用户不知道一组参数应该调用哪一种方法重载，那么使用 API 时很可能会导致错误。这些错误很可能在运行时表现为不稳定的行为，许多程序员将很难诊断它们。因此，**应该避免混淆重载的用法。**
+因为覆盖是常态，而重载是例外，所以覆盖满足了人们对方法调用行为的期望。正如 CollectionClassifier 示例所示，重载很容易混淆这些期望。编写可能使程序员感到困惑的代码是不好的行为。对于 API 尤其如此。如果 API 的用户不知道一组参数应该调用哪一种方法重载，那么使用 API 时很可能会导致错误。这些错误很可能在运行时表现为不稳定的行为，许多程序员将很难诊断它们。因此，**应该避免混淆重载的用法。**
 
 Exactly what constitutes a confusing use of overloading is open to some debate. **A safe, conservative policy is never to export two overloadings with the same number of parameters.** If a method uses varargs, a conservative policy is not to overload it at all, except as described in Item 53. If you adhere to these restrictions, programmers will never be in doubt as to which overloading applies to any set of actual parameters. These restrictions are not terribly onerous because **you can always give methods different names instead of overloading them.**
 

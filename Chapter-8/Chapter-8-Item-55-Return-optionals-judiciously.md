@@ -54,7 +54,7 @@ As you can see, it is straightforward to return an optional. All you have to do 
 
 Many terminal operations on streams return optionals. If we rewrite the max method to use a stream, Stream’s max operation does the work of generating an optional for us (though we do have to pass in an explicit comparator):
 
-许多流上的中间操作返回 Optional。如果我们使用一个流来重写 max 方法，那么流版本的 max 操作会为我们生成一个 Optional（尽管我们必须传递一个显式的 comparator）：
+许多流上的中间操作返回 Optional。如果我们使用一个流来覆盖 max 方法，那么流版本的 max 操作会为我们生成一个 Optional（尽管我们必须传递一个显式的 comparator）：
 
 ```java
 // Returns max val in collection as Optional<E> - uses stream

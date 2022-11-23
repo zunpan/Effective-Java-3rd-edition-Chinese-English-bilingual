@@ -131,7 +131,7 @@ public class WeightTable {
 
 Note that Planet, like all enums, has a static values method that returns an array of its values in the order they were declared. Note also that the toString method returns the declared name of each enum value, enabling easy printing by println and printf. If you’re dissatisfied with this string representation, you can change it by overriding the toString method. Here is the result of running our WeightTable program (which doesn’t override toString) with the command line argument 185:
 
-请注意，Planet 和所有枚举一样，有一个静态 values() 方法，该方法按照声明值的顺序返回其值的数组。还要注意的是，toString 方法返回每个枚举值的声明名称，这样就可以通过 println 和 printf 轻松打印。如果你对这个字符串表示不满意，可以通过重写 toString 方法来更改它。下面是用命令行运行我们的 WeightTable 程序（未覆盖 toString）的结果：
+请注意，Planet 和所有枚举一样，有一个静态 values() 方法，该方法按照声明值的顺序返回其值的数组。还要注意的是，toString 方法返回每个枚举值的声明名称，这样就可以通过 println 和 printf 轻松打印。如果你对这个字符串表示不满意，可以通过覆盖 toString 方法来更改它。下面是用命令行运行我们的 WeightTable 程序（未覆盖 toString）的结果：
 
 ```
 Weight on MERCURY is 69.912739
@@ -202,7 +202,7 @@ If you add a new constant to the second version of Operation, it is unlikely tha
 
 Constant-specific method implementations can be combined with constantspecific data. For example, here is a version of Operation that overrides the toString method to return the symbol commonly associated with the operation:
 
-特定常量方法实现可以与特定于常量的数据相结合。例如，下面是 Operation 枚举的一个版本，它重写 toString 方法来返回与操作相关的符号：
+特定常量方法实现可以与特定于常量的数据相结合。例如，下面是 Operation 枚举的一个版本，它覆盖 toString 方法来返回与操作相关的符号：
 
 **译注：原文 constantspecific data 应修改为 constant-specific data ，译为「特定常量数据」**
 
@@ -235,7 +235,7 @@ public enum Operation {
 
 The toString implementation shown makes it easy to print arithmetic expressions, as demonstrated by this little program:
 
-重写的 toString 实现使得打印算术表达式变得很容易，如下面的小程序所示：
+覆盖的 toString 实现使得打印算术表达式变得很容易，如下面的小程序所示：
 
 ```
 public static void main(String[] args) {
@@ -259,7 +259,7 @@ Running this program with 2 and 4 as command line arguments produces the followi
 
 Enum types have an automatically generated valueOf(String) method that translates a constant’s name into the constant itself. If you override the toString method in an enum type, consider writing a fromString method to translate the custom string representation back to the corresponding enum. The following code (with the type name changed appropriately) will do the trick for any enum, so long as each constant has a unique string representation:
 
-枚举类型有一个自动生成的 valueOf(String) 方法，该方法将常量的名称转换为常量本身。如果在枚举类型中重写 toString 方法，可以考虑编写 fromString 方法将自定义字符串表示形式转换回相应的枚举。只要每个常量都有唯一的字符串表示形式，下面的代码（类型名称适当更改）就可以用于任何枚举：
+枚举类型有一个自动生成的 valueOf(String) 方法，该方法将常量的名称转换为常量本身。如果在枚举类型中覆盖 toString 方法，可以考虑编写 fromString 方法将自定义字符串表示形式转换回相应的枚举。只要每个常量都有唯一的字符串表示形式，下面的代码（类型名称适当更改）就可以用于任何枚举：
 
 ```
 // Implementing a fromString method on an enum type
@@ -348,7 +348,7 @@ To perform the pay calculation safely with constant-specific method implementati
 
 The boilerplate could be reduced by replacing the abstract overtimePay method on PayrollDay with a concrete method that performs the overtime calculation for weekdays. Then only the weekend days would have to override the method. But this would have the same disadvantage as the switch statement: if you added another day without overriding the overtimePay method, you would silently inherit the weekday calculation.
 
-用工作日加班计算的具体方法代替发薪日的抽象加班法，可以减少样板。那么只有周末才需要重写该方法。但是这与 switch 语句具有相同的缺点：如果你在不覆盖 overtimePay 方法的情况下添加了另一天，那么你将默默地继承工作日的计算。
+用工作日加班计算的具体方法代替发薪日的抽象加班法，可以减少样板。那么只有周末才需要覆盖该方法。但是这与 switch 语句具有相同的缺点：如果你在不覆盖 overtimePay 方法的情况下添加了另一天，那么你将默默地继承工作日的计算。
 
 What you really want is to be forced to choose an overtime pay strategy each time you add an enum constant. Luckily, there is a nice way to achieve this. The idea is to move the overtime pay computation into a private nested enum, and to pass an instance of this strategy enum to the constructor for the PayrollDay enum. The PayrollDay enum then delegates the overtime pay calculation to the strategy enum, eliminating the need for a switch statement or constantspecific method implementation in PayrollDay. While this pattern is less concise than the switch statement, it is safer and more flexible:
 
