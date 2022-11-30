@@ -90,7 +90,7 @@ There are a few more restrictions that a class must obey to allow inheritance.**
 
 为了允许继承，类必须遵守更多的限制。**构造函数不能直接或间接调用可覆盖的方法。** 如果你违反了这个规则，程序就会失败。超类构造函数在子类构造函数之前运行，因此在子类构造函数运行之前将调用子类中的覆盖方法。如果覆盖方法依赖于子类构造函数执行的任何初始化，则该方法的行为将不像预期的那样。为了使其具体化，下面是一个违反此规则的类：
 
-```
+```java
 public class Super {
     // Broken - constructor invokes an overridable method
     public Super() {
@@ -105,7 +105,7 @@ Here’s a subclass that overrides the overrideMe method, which is erroneously i
 
 下面是覆盖 overrideMe 方法的子类，Super 的唯一构造函数错误地调用了 overrideMe 方法：
 
-```
+```java
 public final class Sub extends Super {
     // Blank final, set by constructor
     private final Instant instant;
@@ -175,5 +175,6 @@ In summary, designing a class for inheritance is hard work. You must document al
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-4/Chapter-4-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 18: Favor composition over inheritance（优先选择复合而不是继承）](/Chapter-4/Chapter-4-Item-18-Favor-composition-over-inheritance.md)**
 - **Next Item（下一条目）：[Item 20: Prefer interfaces to abstract classes（接口优于抽象类）](/Chapter-4/Chapter-4-Item-20-Prefer-interfaces-to-abstract-classes.md)**
