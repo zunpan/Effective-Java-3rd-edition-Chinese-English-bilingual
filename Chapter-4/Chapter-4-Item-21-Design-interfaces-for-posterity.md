@@ -18,7 +18,7 @@ For example, consider the removeIf method, which was added to the Collection int
 
 例如，考虑在 Java 8 中被添加到集合接口中的 removeIf 方法。该方法删除了给定的布尔函数（或 predicate）返回 true 的所有元素。指定默认实现，以使用迭代器遍历集合，在每个元素上调用 predicate，并使用迭代器的 remove 方法删除 predicate 返回 true 的元素。声明大概是这样的：
 
-```
+```java
 // Default method added to the Collection interface in Java 8
 default boolean removeif(predicate<? super e> filter) {
     objects.requirenonnull(filter);
@@ -39,7 +39,7 @@ This is the best general-purpose implementation one could possibly write for the
 
 The Apache SynchronizedCollection class is still being actively maintained, but as of this writing, it does not override the removeIf method. If this class is used in conjunction with Java 8, it will therefore inherit the default implementation of removeIf, which does not, indeed cannot, maintain the class’s fundamental promise: to automatically synchronize around each method invocation. The default implementation knows nothing about synchronization and has no access to the field that contains the locking object. If a client calls the removeIf method on a SynchronizedCollection instance in the presence of concurrent modification of the collection by another thread, a ConcurrentModificationException or other unspecified behavior may result.
 
-Apache SynchronizedCollection 类仍然得到了积极的维护，但是在编写本文时，它没有覆盖 removeIf 方法。如果这个类与 Java 8 一起使用，那么它将继承 removeIf 的默认实现，而 removeIf 并不能维护类的基本承诺：自动同步每个方法调用。默认实现对同步一无所知，也无法访问包含锁定对象的字段。如果客户端在 SynchronizedCollection 实例上调用 removeIf 方法，而另一个线程同时修改了集合，那么可能会导致 ConcurrentModificationException 或其他未指定的行为。
+Apache SynchronizedCollection 类仍然得到了积极的维护，但是在编写本文时，它没有覆盖 removeIf 方法（4.0的问题，已经修复）。如果这个类与 Java 8 一起使用，那么它将继承 removeIf 的默认实现，而 removeIf 并不能维护类的基本承诺：自动同步每个方法调用。默认实现对同步一无所知，也无法访问包含锁定对象的字段。如果客户端在 SynchronizedCollection 实例上调用 removeIf 方法，而另一个线程同时修改了集合，那么可能会导致 ConcurrentModificationException 或其他未指定的行为。
 
 In order to prevent this from happening in similar Java platform libraries implementations, such as the package-private class returned by Collections.synchronizedCollection, the JDK maintainers had to override the default removeIf implementation and other methods like it to perform the necessary synchronization before invoking the default implementation. Preexisting collection implementations that were not part of the Java platform did not have the opportunity to make analogous changes in lockstep with the interface change, and some have yet to do so.
 
@@ -67,5 +67,6 @@ Therefore, it is critically important to test each new interface before you rele
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-4/Chapter-4-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 20: Prefer interfaces to abstract classes（接口优于抽象类）](/Chapter-4/Chapter-4-Item-20-Prefer-interfaces-to-abstract-classes.md)**
 - **Next Item（下一条目）：[Item 22: Use interfaces only to define types（接口只用于定义类型）](/Chapter-4/Chapter-4-Item-22-Use-interfaces-only-to-define-types.md)**

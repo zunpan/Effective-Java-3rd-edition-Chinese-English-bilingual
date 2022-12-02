@@ -24,7 +24,7 @@ Java 有两种机制来定义允许多种实现的类型：接口和抽象类。
 
 **接口允许构造非层次化类型框架。** 类型层次结构对于组织一些事情很好，但是其他事情不能整齐地归入严格的层次结构。例如，假设我们有一个代表歌手的接口和另一个代表词曲作者的接口：
 
-```
+```java
 public interface Singer {
     AudioClip sing(Song s);
 }
@@ -38,7 +38,7 @@ In real life, some singers are also songwriters. Because we used interfaces rath
 
 在现实生活中，一些歌手也是词曲作者。因为我们使用接口而不是抽象类来定义这些类型，所以完全允许单个类同时实现歌手和词曲作者。事实上，我们可以定义第三个接口，扩展歌手和词曲作者，并添加适合这种组合的新方法：
 
-```
+```java
 public interface SingerSongwriter extends Singer, Songwriter {
     AudioClip strum();
     void actSensitive();
@@ -47,7 +47,7 @@ public interface SingerSongwriter extends Singer, Songwriter {
 
 You don’t always need this level of flexibility, but when you do, interfaces are a lifesaver. The alternative is a bloated class hierarchy containing a separate class for every supported combination of attributes. If there are n attributes in the type system, there are 2n possible combinations that you might have to support. This is what’s known as a combinatorial explosion. Bloated class hierarchies can lead to bloated classes with many methods that differ only in the type of their arguments because there are no types in the class hierarchy to capture common behaviors.
 
-你并不总是需要这种级别的灵活性，但是当你需要时，接口就是救星。另一种选择是一个臃肿的类层次结构，它为每个受支持的属性组合包含一个单独的类。如果类型系统中有 n 个属性，那么可能需要支持 2<sup>n</sup>种组合。这就是所谓的组合爆炸。臃肿的类层次结构可能导致类也臃肿，其中许多方法只在其参数的类型上有所不同，因为类层次结构中没有类型来捕获公共行为。
+你并不总是需要这种级别的灵活性，但是当你需要时，接口就是救星。另一种选择是一个臃肿的类层次结构，它为每个受支持的属性组合包含一个单独的类。如果类型系统中有 n 个属性，那么可能需要支持 $2^n$种组合。这就是所谓的组合爆炸。臃肿的类层次结构可能导致类也臃肿，其中许多方法只在其参数的类型上有所不同，因为类层次结构中没有类型来捕获公共行为。
 
 Interfaces enable safe, powerful functionality enhancements via the wrapper class idiom (Item 18). If you use abstract classes to define types, you leave the programmer who wants to add functionality with no alternative but inheritance. The resulting classes are less powerful and more fragile than wrapper classes.
 
@@ -69,7 +69,7 @@ By convention, skeletal implementation classes are called AbstractInterface, whe
 
 按照惯例，骨架实现类称为 AbstractInterface，其中 Interface 是它们实现的接口的名称。例如，Collections Framework 提供了一个骨架实现来配合每个主要的集合接口：AbstractCollection、AbstractSet、AbstractList 和 AbstractMap。可以说，将它们称为 SkeletalCollection、SkeletalSet、SkeletalList 和 SkeletalMap 是有意义的，但 Abstract 的用法现在已经根深蒂固。如果设计得当，骨架实现（无论是单独的抽象类，还是仅仅由接口上的默认方法组成）可以使程序员非常容易地提供他们自己的接口实现。例如，这里有一个静态工厂方法，它在 AbstractList 上包含一个完整的、功能完整的 List 实现：
 
-```
+```java
 // Concrete implementation built atop skeletal implementation
 static List<Integer> intArrayAsList(int[] a) {
         Objects.requireNonNull(a);
@@ -112,7 +112,7 @@ As a simple example, consider the Map.Entry interface. The obvious primitives ar
 
 作为一个简单的例子，考虑一下 `Map.Entry` 接口。最明显的基本方法是 getKey、getValue 和（可选的）setValue。该接口指定了 equals 和 hashCode 的行为，并且在基本方法方面有 toString 的明显实现。由于不允许为对象方法提供默认实现，所有实现都放在骨架实现类中：
 
-```
+```java
 // Skeletal implementation class
 public abstract class AbstractMapEntry<K,V> implements Map.Entry<K,V> {
 
@@ -160,5 +160,6 @@ To summarize, an interface is generally the best way to define a type that permi
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-4/Chapter-4-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 19: Design and document for inheritance or else prohibit it（继承要设计良好并且具有文档，否则禁止使用）](/Chapter-4/Chapter-4-Item-19-Design-and-document-for-inheritance-or-else-prohibit-it.md)**
 - **Next Item（下一条目）：[Item 21: Design interfaces for posterity（为后代设计接口）](/Chapter-4/Chapter-4-Item-21-Design-interfaces-for-posterity.md)**
