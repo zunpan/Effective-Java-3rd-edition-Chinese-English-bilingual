@@ -12,7 +12,7 @@ Recall from Item 28 that a non-reifiable type is one whose runtime representatio
 
 回想一下 [Item-28](/Chapter-5/Chapter-5-Item-28-Prefer-lists-to-arrays.md)，非具体化类型是指其运行时表示的信息少于其编译时表示的信息，并且几乎所有泛型和参数化类型都是不可具体化的。如果方法声明其可变参数为不可具体化类型，编译器将在声明上生成警告。如果方法是在其推断类型不可具体化的可变参数上调用的，编译器也会在调用时生成警告。生成的警告就像这样：
 
-```
+```java
 warning: [unchecked] Possible heap pollution from parameterized vararg type List<String>
 ```
 
@@ -24,7 +24,7 @@ For example, consider this method, which is a thinly disguised（伪装的） va
 
 例如，考虑这个方法，它摘自 127 页（[Item-26](/Chapter-5/Chapter-5-Item-26-Do-not-use-raw-types.md)）的代码片段，但做了些修改：
 
-```
+```java
 // Mixing generics and varargs can violate type safety!
 // 泛型和可变参数混合使用可能违反类型安全原则！
 static void dangerous(List<String>... stringLists) {
@@ -53,13 +53,13 @@ In Java 7, the SafeVarargs annotation was added to the platform, to allow the au
 
 It is critical that you do not annotate a method with @SafeVarargs unless it actually is safe. So what does it take to ensure this? Recall that a generic array is created when the method is invoked, to hold the varargs parameters. If the method doesn’t store anything into the array (which would overwrite the parameters) and doesn’t allow a reference to the array to escape (which would enable untrusted code to access the array), then it’s safe. In other words, if the varargs parameter array is used only to transmit a variable number of arguments from the caller to the method—which is, after all, the purpose of varargs—then the method is safe.
 
-关键问题是，使用 @SafeVarargs 注释方法，该方法实际上应该是安全的。那么怎样才能确保这一点呢？回想一下，在调用该方法时创建了一个泛型数组来保存可变参数。如果方法没有将任何内容存储到数组中（这会覆盖参数），并且不允许对数组的引用进行转义（这会使不受信任的代码能够访问数组），那么它就是安全的。换句话说，如果可变参数数组仅用于将可变数量的参数从调用方传输到方法（毕竟这是可变参数的目的），那么该方法是安全的。
+关键问题是，使用 @SafeVarargs 注释方法，该方法实际上应该是安全的。那么怎样才能确保这一点呢？回想一下，在调用该方法时创建了一个泛型数组来保存可变参数。如果方法没有将任何内容存储到数组中（这会覆盖参数），并且不允许对数组的引用逃逸（这会使不受信任的代码能够访问数组），那么它就是安全的。换句话说，如果可变参数数组仅用于将可变数量的参数从调用方传输到方法（毕竟这是可变参数的目的），那么该方法是安全的。
 
 It is worth noting that you can violate type safety without ever storing anything in the varargs parameter array. Consider the following generic varargs method, which returns an array containing its parameters. At first glance, it may look like a handy little utility:
 
 值得注意的是，在可变参数数组中不存储任何东西就可能违反类型安全性。考虑下面的通用可变参数方法，它返回一个包含参数的数组。乍一看，它似乎是一个方便的小实用程序：
 
-```
+```java
 // UNSAFE - Exposes a reference to its generic parameter array!
 static <T> T[] toArray(T... args) {
   return args;
@@ -74,7 +74,7 @@ To make this concrete, consider the following generic method, which takes three 
 
 为了使其具体化，请考虑下面的泛型方法，该方法接受三个类型为 T 的参数，并返回一个包含随机选择的两个参数的数组：
 
-```
+```java
 static <T> T[] pickTwo(T a, T b, T c) {
   switch(ThreadLocalRandom.current().nextInt(3)) {
     case 0: return toArray(a, b);
@@ -97,7 +97,7 @@ Now consider this main method, which exercises pickTwo:
 
 现在考虑这个主要方法，练习 pickTwo：
 
-```
+```java
 public static void main(String[] args) {
   String[] attributes = pickTwo("Good", "Fast", "Cheap");
 }
@@ -115,7 +115,7 @@ Here is a typical example of a safe use of a generic varargs parameter. This met
 
 下面是一个安全使用泛型可变参数的典型示例。该方法接受任意数量的列表作为参数，并返回一个包含所有输入列表的元素的序列列表。因为该方法是用 @SafeVarargs 注释的，所以它不会在声明或调用点上生成任何警告：
 
-```
+```java
 // Safe method with a generic varargs parameter
 @SafeVarargs
 static <T> List<T> flatten(List<? extends T>... lists) {
@@ -147,7 +147,7 @@ An alternative to using the SafeVarargs annotation is to take the advice of Item
 
 使用 SafeVarargs 注释的另一种选择是接受 [Item-28](/Chapter-5/Chapter-5-Item-28-Prefer-lists-to-arrays.md) 的建议，并用 List 参数替换可变参数（它是一个伪装的数组）。下面是将这种方法应用到我们的 flatten 方法时的效果。注意，只有参数声明发生了更改：
 
-```
+```java
 // List as a typesafe alternative to a generic varargs parameter
 static <T> List<T> flatten(List<List<? extends T>> lists) {
   List<T> result = new ArrayList<>();
@@ -161,7 +161,7 @@ This method can then be used in conjunction with the static factory method List.
 
 然后可以将此方法与静态工厂方法 List.of 一起使用，以允许可变数量的参数。注意，这种方法依赖于 List.of 声明是用 @SafeVarargs 注释的：
 
-```
+```java
 audience = flatten(List.of(friends, romans, countrymen));
 ```
 
@@ -173,7 +173,7 @@ This trick can also be used in situations where it is impossible to write a safe
 
 这种技巧也可用于无法编写安全的可变参数方法的情况，如第 147 页中的 toArray 方法。它的列表类似于 List.of 方法，我们甚至不用写；Java 库的作者为我们做了这些工作。pickTwo 方法变成这样：
 
-```
+```java
 static <T> List<T> pickTwo(T a, T b, T c) {
   switch(rnd.nextInt(3)) {
     case 0: return List.of(a, b);
@@ -188,7 +188,7 @@ and the main method becomes this:
 
 main 方法是这样的：
 
-```
+```java
 public static void main(String[] args) {
   List<String> attributes = pickTwo("Good", "Fast", "Cheap");
 }
@@ -204,5 +204,6 @@ In summary, varargs and generics do not interact well because the varargs facili
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-5/Chapter-5-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 31: Use bounded wildcards to increase API flexibility（使用有界通配符增加 API 的灵活性）](/Chapter-5/Chapter-5-Item-31-Use-bounded-wildcards-to-increase-API-flexibility.md)**
 - **Next Item（下一条目）：[Item 33: Consider typesafe heterogeneous containers（考虑类型安全的异构容器）](/Chapter-5/Chapter-5-Item-33-Consider-typesafe-heterogeneous-containers.md)**
