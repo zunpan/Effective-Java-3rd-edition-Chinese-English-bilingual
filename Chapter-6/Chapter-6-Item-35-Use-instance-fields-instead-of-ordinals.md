@@ -43,5 +43,6 @@ The Enum specification has this to say about ordinal: “Most programmers will h
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-6/Chapter-6-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 34: Use enums instead of int constants（用枚举类型代替 int 常量）](/Chapter-6/Chapter-6-Item-34-Use-enums-instead-of-int-constants.md)**
 - **Next Item（下一条目）：[Item 36: Use EnumSet instead of bit fields（用 EnumSet 替代位字段）](/Chapter-6/Chapter-6-Item-36-Use-EnumSet-instead-of-bit-fields.md)**
