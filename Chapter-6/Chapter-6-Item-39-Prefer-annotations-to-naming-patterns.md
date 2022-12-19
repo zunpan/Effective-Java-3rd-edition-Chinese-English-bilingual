@@ -139,9 +139,9 @@ public class RunTests {
                 } catch (Exception exc) {
                     System.out.println("Invalid @Test: " + m);
                 }
+            }
         }
-    }
-    System.out.printf("Passed: %d, Failed: %d%n",passed, tests - passed);
+        System.out.printf("Passed: %d, Failed: %d%n",passed, tests - passed);
     }
 }
 ```

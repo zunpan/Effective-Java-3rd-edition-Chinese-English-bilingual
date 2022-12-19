@@ -17,7 +17,8 @@ class Plant {
         this.lifeCycle = lifeCycle;
     }
 
-    @Override public String toString() {
+    @Override 
+    public String toString() {
         return name;
     }
 }
@@ -57,7 +58,7 @@ Plant[] garden = new Plant[]{
 ```
 
 输出结果为：
-```
+```java
 ANNUAL: [A]
 PERENNIAL: [E, C]
 BIENNIAL: [B, D]
@@ -71,7 +72,7 @@ There is a much better way to achieve the same effect. The array is effectively 
 
 有一种更好的方法可以达到同样的效果。该数组有效地充当从枚举到值的映射，因此你不妨使用 Map。更具体地说，有一种非常快速的 Map 实现，用于枚举键，称为 `java.util.EnumMap`。以下就是这个程序在使用 EnumMap 时的样子：
 
-```
+```java
 // Using an EnumMap to associate data with an enum
 Map<Plant.LifeCycle, Set<Plant>> plantsByLifeCycle =new EnumMap<>(Plant.LifeCycle.class);
 
@@ -87,8 +88,6 @@ System.out.println(plantsByLifeCycle);
 This program is shorter, clearer, safer, and comparable in speed to the original version. There is no unsafe cast; no need to label the output manually because the map keys are enums that know how to translate themselves to printable strings; and no possibility for error in computing array indices. The reason that EnumMap is comparable in speed to an ordinal-indexed array is that EnumMap uses such an array internally, but it hides this implementation detail from the programmer, combining the richness and type safety of a Map with the speed of an array. Note that the EnumMap constructor takes the Class object of the key type: this is a bounded type token, which provides runtime generic type information (Item 33).
 
 这个程序比原来的版本更短，更清晰，更安全，速度也差不多。没有不安全的转换；不需要手动标记输出，因为 Map 的键是能转换为可打印字符串的枚举；在计算数组索引时不可能出错。EnumMap 在速度上与有序索引数组相当的原因是，EnumMap 在内部使用这样的数组，但是它向程序员隐藏了实现细节，将 Map 的丰富的功能和类型安全性与数组的速度结合起来。注意，EnumMap 构造函数接受键类型的 Class 对象：这是一个有界类型标记，它提供运行时泛型类型信息（[Item-33](/Chapter-5/Chapter-5-Item-33-Consider-typesafe-heterogeneous-containers.md)）。
-
-**PP注**：前面文章里有种说法是泛型信息会在运行时被擦除，这里又说提供运行时泛型类型信息，是不是有冲突？查阅一些资料后，得出一个观点：局部变量的泛型信息运行时会被擦除，也就是说没有办法通过反射获取，成员变量的泛型，函数入参的泛型，继承泛型父类或实现泛型接口并指定了泛型都可以反射获取到泛型信息
 
 The previous program can be further shortened by using a stream (Item 45) to manage the map. Here is the simplest stream-based code that largely duplicates the behavior of the previous example:
 
