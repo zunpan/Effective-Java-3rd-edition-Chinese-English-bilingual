@@ -44,7 +44,7 @@ This client code works, but it is too noisy and opaque to use in practice. A bet
 
 这个客户端代码可以工作，但是它太过繁琐并不易理解，无法在实践中使用。更好的解决方案是使用适配器方法。JDK 没有提供这样的方法，但是使用上面代码片段中使用的内联技术编写方法很容易。注意，适配器方法中不需要强制转换，因为 Java 的类型推断在此上下文中工作正常：
 
-```
+```java
 // Adapter from Stream<E> to Iterable<E>
 public static <E> Iterable<E> iterableOf(Stream<E> stream) {
     return stream::iterator;
@@ -55,7 +55,7 @@ With this adapter, you can iterate over any stream with a for-each statement:
 
 使用此适配器，你可以使用 for-each 语句遍历任何流：
 
-```
+```java
 for (ProcessHandle p : iterableOf(ProcessHandle.allProcesses())) {
     // Process the process
 }
@@ -69,7 +69,7 @@ Conversely, a programmer who wants to process a sequence using a stream pipeline
 
 相反，如果程序员希望使用流管道来处理序列，那么只提供可迭代的 API 就会有理由让他心烦。JDK 同样没有提供适配器，但是编写适配器非常简单：
 
-```
+```java
 // Adapter from Iterable<E> to Stream<E>
 public static <E> Stream<E> streamOf(Iterable<E> iterable) {
     return StreamSupport.stream(iterable.spliterator(), false);
@@ -161,7 +161,7 @@ Note that the Stream.concat method is used to add the empty list into the return
 
 注意 `Stream.concat` 方法将空列表添加到返回的流中。还要注意，flatMap 方法（[Item-45](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md)）用于生成由所有前缀的所有后缀组成的单一流。最后，请注意，我们通过映射由 `IntStream.range` 和 `IntStream.rangeClosed` 返回的连续 int 值流来生成前缀和后缀。因此，我们的子列表实现在本质上类似于嵌套的 for 循环：
 
-```
+```java
 for (int start = 0; start < src.size(); start++)
     for (int end = start + 1; end <= src.size(); end++)
         System.out.println(src.subList(start, end));

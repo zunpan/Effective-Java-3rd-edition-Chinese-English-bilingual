@@ -186,5 +186,6 @@ In summary, the essence of programming stream pipelines is side-effect-free func
 
 ---
 **[Back to contents of the chapter（返回章节目录）](/Chapter-7/Chapter-7-Introduction.md)**
+
 - **Previous Item（上一条目）：[Item 45: Use streams judiciously（明智地使用流）](/Chapter-7/Chapter-7-Item-45-Use-streams-judiciously.md)**
 - **Next Item（下一条目）：[Item 47: Prefer Collection to Stream as a return type（优先选择 Collection 而不是流作为返回类型）](/Chapter-7/Chapter-7-Item-47-Prefer-Collection-to-Stream-as-a-return-type.md)**
