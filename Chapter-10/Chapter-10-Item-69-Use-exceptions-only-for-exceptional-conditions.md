@@ -10,10 +10,10 @@ Someday, if you are unlucky, you may stumble across a piece of code that looks s
 // Horrible abuse of exceptions. Don't ever do this!
 try {
     int i = 0;
-    while(true)
+    while(true){
         range[i++].climb();
     }
-    catch (ArrayIndexOutOfBoundsException e) {
+    catch (ArrayIndexOutOfBoundsException e) {}
 }
 ```
 
